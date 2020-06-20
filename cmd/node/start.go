@@ -1,6 +1,7 @@
-package clicmd
+package nodecmd
 
 import (
+	"feng/business/node"
 	"feng/internal/log"
 	"fmt"
 
@@ -8,8 +9,8 @@ import (
 )
 
 // getCmd represents the get command
-var getCmd = &cobra.Command{
-	Use:   "get",
+var startCmd = &cobra.Command{
+	Use:   "start",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -18,12 +19,13 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.AppName = "cli-get"
-		log.AppLog().Infof("get called")
-		fmt.Println("get called")
+		log.AppName = "node-start"
+		log.AppLog().Infof("node start")
+		fmt.Println("node start")
+		node.Start()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(startCmd)
 }

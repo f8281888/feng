@@ -16,15 +16,18 @@ limitations under the License.
 package nodecmd
 
 import (
+	"feng/config"
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/spf13/cobra"
 )
 
-var cfgFile string
+var cfgPath string
+var logPath string
+var dataPath string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,41 +54,16 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().StringVar(&cfgPath, "config-path", "../config", "config path")
+	rootCmd.PersistentFlags().StringVar(&dataPath, "data-path", "../data", "data path")
+	rootCmd.PersistentFlags().StringVar(&logPath, "log-path", "../logs", "log path")
 	cobra.OnInitialize(initConfig)
+	_ = viper.BindPFlag("log-path", rootCmd.PersistentFlags().Lookup("log-path"))
+	_ = viper.BindPFlag("config-path", rootCmd.PersistentFlags().Lookup("config-path"))
+	_ = viper.BindPFlag("data-path", rootCmd.PersistentFlags().Lookup("data-path"))
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.feng.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".feng" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".feng")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	config.InitConfig(cfgPath, "node", &config.NodeConf)
 }
