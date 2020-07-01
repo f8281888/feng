@@ -1,6 +1,23 @@
 
 {
   "version":1,
-  "versionstr":"version 1.0",
-  "fullversionstr":"version 1.0.1"
+  "versionStr":"version 1.0",
+  "fullversionStr":"version 1.0.1",
+  "peerLogFormat":"[\"${_name}\" ${_ip}:${_port}]",
+  "syncFetchSpan":  100,
+  "connectionCleanupPeriod":30,
+  "maxCleanupTimeMsec":10,
+  "maxClients":25,
+  "p2pMaxNodesPerHost":1,
+  "p2pAcceptTransactions": true,
+  "useSocketReadWatermark": true,
+  "p2pListenEndpoint":"0.0.0.0:9876",
+  "p2pServerAddress":"",
+  "netThreads" : 2,
+  "p2pPeerAddress" :[],
+  "agentName" :"test agent",
+  "allowedConnection" : ["any"],
+  "peerKey" :[],
+  "peerPrivateKey":{}
+
 }

@@ -36,3 +36,18 @@ func (a *HTTPPlugin) Startup() {
 func (a *HTTPPlugin) Initialize() {
 	println("HTTPPlugin Initialize")
 }
+
+//HandleSighup ..
+func (a *HTTPPlugin) HandleSighup() {
+	println("HTTPPlugin HandleSighup")
+}
+
+//StartUp ..
+func (a *HTTPPlugin) StartUp() {
+	println("HTTPPlugin StartUp")
+}
+
+//PluginStartUp ..
+func (a *HTTPPlugin) PluginStartUp() {
+	println("HTTPPlugin PluginStartUp")
+}

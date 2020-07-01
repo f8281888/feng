@@ -27,6 +27,19 @@ func setName() {
 	name = AppName
 }
 
+//Assert 退出
+func Assert(input ...string) {
+	var err string
+	for _, s := range input {
+		err += s
+		err += ","
+	}
+
+	subLast := err[:len(err)-1]
+	AppLog().Errorf(subLast)
+	os.Exit(-1)
+}
+
 //AppLog AppLog
 func AppLog() *DefaultLog {
 	setName()

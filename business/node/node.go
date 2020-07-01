@@ -21,7 +21,7 @@ func Start() {
 	app.App().SetVersionStr(config.NodeConf.VersionStr)
 	app.App().SetFullVersionStr(config.NodeConf.FullVersionStr)
 	app.App().SetConfigDir(filepath.Join(viper.GetString("config-path")))
-	app.App().SetConfigDir(filepath.Join(viper.GetString("data-path")))
+	app.App().SetDataDir(filepath.Join(viper.GetString("data-path")))
 
 	httpplugin.SetDefaults(httpplugin.HTTPluginDefaults{
 		DefaultUnixSocketPath: "",
@@ -37,5 +37,8 @@ func Start() {
 		os.Exit(-1)
 	}
 
-	log.AppLog().Infof("node %s", app.App().GetVersionStr())
+	log.AppLog().Infof("node %s %s", app.App().GetVersionStr(), app.App().GetFullVersionStr())
+	log.AppLog().Infof("node using configuration file %s", app.App().GetConfiDir())
+	log.AppLog().Infof("node data directory is %s", app.App().GetDataDir())
+	app.App().StartUp()
 }

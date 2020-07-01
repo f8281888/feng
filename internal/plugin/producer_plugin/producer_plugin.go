@@ -15,3 +15,18 @@ func init() {
 func (a *ProducerPlugin) Initialize() {
 	println("ProducerPlugin Initialize")
 }
+
+//HandleSighup ..
+func (a *ProducerPlugin) HandleSighup() {
+	println("ProducerPlugin HandleSighup")
+}
+
+//StartUp ..
+func (a *ProducerPlugin) StartUp() {
+	println("ProducerPlugin StartUp")
+}
+
+//PluginStartUp ..
+func (a *ProducerPlugin) PluginStartUp() {
+	println("ProducerPlugin PluginStartUp")
+}

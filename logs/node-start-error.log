@@ -1,0 +1,3 @@
+2020-06-23T10:30:04.067+0800	ERROR	chain_plugin/chain_plugin.go:59	error
+2020-06-23T10:30:45.268+0800	ERROR	chain_plugin/chain_plugin.go:60	error
+2020-06-23T10:50:54.888+0800	ERROR	log/logger.go:32	error

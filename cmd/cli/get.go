@@ -1,8 +1,8 @@
 package clicmd
 
 import (
+	"feng/business/cli"
 	"feng/internal/log"
-	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -19,8 +19,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.AppName = "cli-get"
-		log.AppLog().Infof("get called")
-		fmt.Println("get called")
+		cli.Start()
 	},
 }
 
