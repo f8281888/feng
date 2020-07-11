@@ -8,7 +8,6 @@ import (
 	httpplugin "feng/internal/plugin/http_plugin"
 	_ "feng/internal/plugin/net_plugin"
 	_ "feng/internal/plugin/producer_plugin"
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -33,8 +32,7 @@ func Start() {
 
 	plugins := []string{"ChainPlugin", "NetPlugin", "ProducerPlugin"}
 	if err := app.App().Initialize(plugins); err != nil {
-		println(err.Error())
-		os.Exit(-1)
+		log.Assert(err.Error())
 	}
 
 	log.AppLog().Infof("node %s %s", app.App().GetVersionStr(), app.App().GetFullVersionStr())

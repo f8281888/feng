@@ -10,8 +10,13 @@ type Sha256 struct {
 }
 
 //New ..
-func (s *Sha256) New(input string) {
+func (s *Sha256) New(input string) Sha256 {
 	h := sha256.New()
 	h.Write([]byte(input))
 	s.Hash = h.Sum(nil)
+	return *s
+}
+
+func (s *Sha256) String() string {
+	return string(s.Hash)
 }

@@ -368,3 +368,231 @@
 2020-07-01T15:47:16.704+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
 2020-07-01T15:47:16.704+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
 2020-07-01T15:47:16.704+0800	INFO	net_plugin/net_plugin.go:208	my node_id is {[]}
+2020-07-06T10:32:23.377+0800	INFO	node/start.go:23	node start
+2020-07-06T10:32:23.377+0800	INFO	node/node.go:19	node business start
+2020-07-06T10:32:23.377+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-06T10:32:23.377+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-06T10:32:23.377+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-06T10:32:23.377+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-06T10:32:23.378+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-06T10:32:27.526+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:56111
+2020-07-06T10:32:48.783+0800	INFO	app/appplication.go:152	receive signal :hangup
+2020-07-07T10:28:56.778+0800	INFO	node/start.go:23	node start
+2020-07-07T10:28:56.779+0800	INFO	node/node.go:19	node business start
+2020-07-07T10:28:56.779+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-07T10:28:56.779+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-07T10:28:56.779+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-07T10:28:56.779+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-07T10:28:56.779+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-07T10:28:56.779+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-07T10:28:56.779+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-07T11:25:40.350+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:55068
+2020-07-07T11:28:51.022+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:55517
+2020-07-07T11:34:28.390+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:56534
+2020-07-07T11:36:13.336+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:56692
+2020-07-07T11:37:04.683+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:56740
+2020-07-07T11:37:59.664+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:56896
+2020-07-07T11:39:13.651+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-07T11:45:30.386+0800	INFO	node/start.go:23	node start
+2020-07-07T11:45:30.387+0800	INFO	node/node.go:19	node business start
+2020-07-07T11:45:30.387+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-07T11:45:30.387+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-07T11:45:30.387+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-07T11:45:30.387+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-07T11:45:30.387+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-07T11:45:30.388+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-07T11:45:30.388+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-07T11:45:45.988+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:57556
+2020-07-07T11:45:56.220+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-08T20:56:37.102+0800	INFO	node/start.go:23	node start
+2020-07-08T20:56:37.103+0800	INFO	node/node.go:19	node business start
+2020-07-08T20:56:37.103+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-08T20:56:37.103+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-08T20:56:37.103+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-08T20:56:37.103+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-08T20:56:37.103+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-08T21:00:09.268+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:50619
+2020-07-09T10:15:26.745+0800	INFO	node/start.go:23	node start
+2020-07-09T10:15:26.746+0800	INFO	node/node.go:19	node business start
+2020-07-09T10:15:26.746+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-09T10:15:26.746+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-09T10:15:26.746+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-09T10:15:26.746+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-09T10:15:26.746+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-09T10:15:26.746+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-09T10:15:26.746+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-09T10:15:38.253+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:53412
+2020-07-09T10:18:33.105+0800	INFO	node/start.go:23	node start
+2020-07-09T10:18:33.106+0800	INFO	node/node.go:19	node business start
+2020-07-09T10:18:33.106+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-09T10:18:33.106+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-09T10:18:33.106+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-09T10:18:33.106+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-09T10:18:33.106+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-09T10:18:33.106+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-09T10:18:33.106+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-09T10:18:35.826+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:127.0.0.1:53628
+2020-07-10T15:27:00.020+0800	INFO	node/start.go:23	node start
+2020-07-10T15:27:00.021+0800	INFO	node/node.go:19	node business start
+2020-07-10T15:27:00.021+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T15:27:00.021+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T15:27:00.021+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T15:27:00.021+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T15:27:00.021+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T15:27:00.021+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T15:27:00.021+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T15:27:05.044+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:10.0.0.49:57986
+2020-07-10T15:27:18.243+0800	INFO	node/start.go:23	node start
+2020-07-10T15:27:18.243+0800	INFO	node/node.go:19	node business start
+2020-07-10T15:27:18.243+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T15:27:18.244+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T15:27:18.244+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T15:27:18.244+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T15:27:18.244+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T15:27:18.244+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T15:27:18.244+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T15:27:21.676+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:10.0.0.49:57998
+2020-07-10T16:42:29.050+0800	INFO	node/start.go:23	node start
+2020-07-10T16:42:29.051+0800	INFO	node/node.go:19	node business start
+2020-07-10T16:42:29.051+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T16:42:29.051+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T16:42:29.051+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T16:42:29.051+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T16:42:29.051+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T16:42:29.051+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T16:42:29.051+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T16:42:31.119+0800	INFO	net_plugin/net_plugin.go:330	Accepted new connection:10.0.0.49:62338
+2020-07-10T16:44:03.260+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T16:44:44.793+0800	INFO	node/start.go:23	node start
+2020-07-10T16:44:44.793+0800	INFO	node/node.go:19	node business start
+2020-07-10T16:44:44.793+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T16:44:44.793+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T16:44:44.793+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T16:44:44.793+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T16:44:44.793+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T16:45:25.426+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T19:43:47.823+0800	INFO	node/start.go:23	node start
+2020-07-10T19:43:47.823+0800	INFO	node/node.go:19	node business start
+2020-07-10T19:43:47.823+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T19:43:47.823+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T19:43:47.823+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T19:43:47.823+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T19:43:47.823+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T19:43:47.823+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T19:43:47.823+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T19:44:10.359+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T19:44:25.565+0800	INFO	node/start.go:23	node start
+2020-07-10T19:44:25.565+0800	INFO	node/node.go:19	node business start
+2020-07-10T19:44:25.565+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T19:44:25.565+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T19:44:25.565+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T19:44:25.565+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T19:44:25.565+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T19:44:25.565+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T19:44:25.565+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T19:45:30.244+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T19:57:39.404+0800	INFO	node/start.go:23	node start
+2020-07-10T19:57:39.404+0800	INFO	node/node.go:19	node business start
+2020-07-10T19:57:39.404+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T19:57:39.404+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T19:57:39.404+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T19:57:39.404+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T19:58:29.994+0800	INFO	node/start.go:23	node start
+2020-07-10T19:58:29.995+0800	INFO	node/node.go:19	node business start
+2020-07-10T19:58:29.995+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T19:58:29.995+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T19:58:29.995+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T19:58:29.995+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T19:58:29.995+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T19:59:03.742+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T20:00:02.655+0800	INFO	node/start.go:23	node start
+2020-07-10T20:00:02.655+0800	INFO	node/node.go:19	node business start
+2020-07-10T20:00:02.655+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T20:00:02.655+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T20:00:02.655+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T20:00:02.655+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T20:00:02.655+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T20:00:02.655+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T20:00:02.655+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T20:02:47.663+0800	INFO	node/start.go:23	node start
+2020-07-10T20:02:47.664+0800	INFO	node/node.go:19	node business start
+2020-07-10T20:02:47.664+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T20:02:47.664+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T20:02:47.664+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T20:02:47.664+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T20:02:47.664+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T20:02:47.664+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T20:02:47.664+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T20:06:18.576+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-10T20:07:11.336+0800	INFO	node/start.go:23	node start
+2020-07-10T20:07:11.337+0800	INFO	node/node.go:19	node business start
+2020-07-10T20:07:11.337+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-10T20:07:11.337+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-10T20:07:11.337+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-10T20:07:11.337+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-10T20:07:11.337+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-10T20:07:11.337+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-10T20:07:11.337+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-10T20:07:20.628+0800	INFO	app/appplication.go:152	receive signal :interrupt
+2020-07-11T17:06:26.006+0800	INFO	node/start.go:23	node start
+2020-07-11T17:06:26.006+0800	INFO	node/node.go:19	node business start
+2020-07-11T17:06:26.006+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-11T17:06:26.006+0800	INFO	node/node.go:40	node version 1.0 version 1.0.1
+2020-07-11T17:06:26.006+0800	INFO	node/node.go:41	node using configuration file ../config
+2020-07-11T17:06:26.006+0800	INFO	node/node.go:42	node data directory is ../data
+2020-07-11T17:06:26.006+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-11T17:06:26.006+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-11T17:06:26.007+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-11T17:06:26.007+0800	INFO	http_plugin/http_plugin.go:102	configured http to listen on 127.0.0.1:8888
+2020-07-11T17:07:10.959+0800	INFO	net_plugin/net_plugin.go:335	Accepted new connection:10.0.0.49:60447
+2020-07-11T17:07:24.884+0800	INFO	net_plugin/net_plugin.go:335	Accepted new connection:10.0.0.49:60454
+2020-07-11T17:10:00.950+0800	INFO	app/appplication.go:157	receive signal :interrupt
+2020-07-11T17:27:07.611+0800	INFO	node/start.go:23	node start
+2020-07-11T17:27:07.611+0800	INFO	node/node.go:18	node business start
+2020-07-11T17:27:07.611+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-11T17:27:07.611+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-11T17:27:07.611+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-11T17:27:07.611+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-11T17:27:07.612+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-11T17:27:07.612+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-11T17:27:07.612+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-11T17:27:07.612+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-11T17:27:09.555+0800	ERROR	log/logger.go:32	HandletHTTP listener is error%!(EXTRA []interface {}=[])
+2020-07-11T17:39:40.736+0800	INFO	node/start.go:23	node start
+2020-07-11T17:39:40.736+0800	INFO	node/node.go:18	node business start
+2020-07-11T17:39:40.736+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-11T17:39:40.736+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-11T17:39:40.736+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-11T17:39:40.736+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-11T17:39:40.737+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-11T17:39:40.737+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-11T17:39:40.737+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-11T17:39:40.737+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-11T17:39:40.737+0800	ERROR	net_plugin/net_plugin.go:278	prot:%s9876
+2020-07-11T17:39:40.737+0800	ERROR	log/logger.go:45	http_plugin::plugin_startup failed to http bind to port
+2020-07-11T17:39:40.737+0800	ERROR	log/logger.go:45	net_plugin::plugin_startup failed to bind to port
+2020-07-11T17:39:51.942+0800	INFO	node/start.go:23	node start
+2020-07-11T17:39:51.942+0800	INFO	node/node.go:18	node business start
+2020-07-11T17:39:51.942+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-11T17:39:51.942+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-11T17:39:51.942+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-11T17:39:51.942+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-11T17:39:51.943+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-11T17:39:51.943+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-11T17:39:51.943+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-11T17:39:51.943+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-11T17:39:51.943+0800	ERROR	net_plugin/net_plugin.go:278	prot:%s9876
+2020-07-11T17:39:51.943+0800	ERROR	log/logger.go:45	http_plugin::plugin_startup failed to http bind to port
+2020-07-11T17:39:51.943+0800	ERROR	log/logger.go:45	net_plugin::plugin_startup failed to bind to port
+2020-07-11T17:40:06.672+0800	INFO	node/start.go:23	node start
+2020-07-11T17:40:06.672+0800	INFO	node/node.go:18	node business start
+2020-07-11T17:40:06.672+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-11T17:40:06.672+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-11T17:40:06.672+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-11T17:40:06.672+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-11T17:40:06.672+0800	INFO	chain/controller.go:102	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-11T17:40:06.672+0800	INFO	chain/controller.go:154	Initializing new blockchain with genesis state
+2020-07-11T17:40:06.672+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-11T17:40:06.673+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-11T17:46:51.347+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-11T17:46:51.349+0800	ERROR	log/logger.go:45	startSighupHandler

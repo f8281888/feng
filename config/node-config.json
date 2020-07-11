@@ -18,6 +18,16 @@
   "agentName" :"test agent",
   "allowedConnection" : ["any"],
   "peerKey" :[],
-  "peerPrivateKey":{}
-
+  "peerPrivateKey":{},
+  "httpValidateHost":true,
+  "httpAlias":{},
+  "httpServerAddress": "127.0.0.1:8888",
+  "httpsCertificateChainFile":"",
+  "httpsServerAddress": "",
+  "httpsPrivateKeyFile":"",
+  "maxBodySize":1048576,
+  "verboseHttpErrors":false,
+  "httpThreads":2,
+  "httpMaxBytesInFlightMb": 500,
+  "httpMaxResponseTimeMs":30
 }

@@ -12,6 +12,7 @@ import (
 	"feng/internal/pool"
 	"net"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -31,9 +32,8 @@ type ConnectionStauts struct {
 type netPluginImpl struct {
 	//直接跳过accept,用来监听
 	Listener                           *net.TCPListener
-	Coon                               net.Conn
 	CurrentConnectionID                atomic.Uint32
-	SyncMaster                         *SyncMaster
+	SyncManager                        *SyncManager
 	Dispatcher                         *DispatcherManager
 	P2pAddress                         string
 	P2pServerAddress                   string
@@ -78,6 +78,41 @@ type netPluginImpl struct {
 	chainForkHeadBlkID                 crypto.Sha256
 }
 
+//GetChainInfo ..
+func (n *netPluginImpl) GetChainInfo() (uint32, uint32, uint32, crypto.Sha256, crypto.Sha256, crypto.Sha256) {
+	n.chainInfoMtx.Lock()
+	defer n.chainInfoMtx.Unlock()
+	return n.chainLibNum, n.chainHeadBlkNum, n.chainForkHeadBlkNum, n.chainLibID, n.chainHeadBlkID, n.chainForkHeadBlkID
+}
+
+//GetAuthenticationKey ..
+func (n *netPluginImpl) GetAuthenticationKey() crypto.PublicKey {
+	if len(n.PrivateKeys) != 0 {
+		for k, v := range n.PrivateKeys {
+			println(reflect.TypeOf(v).Name())
+			return k
+		}
+	}
+
+	return crypto.PublicKey{}
+}
+
+//SignCompact ..
+func (n *netPluginImpl) SignCompact(signer crypto.PublicKey, digest crypto.Sha256) crypto.Signature {
+	// privateKeyItr, ok := n.PrivateKeys[signer]
+	// if !ok {
+	// 	privateKeyItr[signer].
+	// }
+	//签名的东西先跳过
+	// 	auto private_key_itr = private_keys.find(signer);
+	// 	if(private_key_itr != private_keys.end())
+	// 	   return private_key_itr->second.sign(digest);
+	// 	if(producer_plug != nullptr && producer_plug->get_state() == abstract_plugin::started)
+	// 	   return producer_plug->sign_compact(signer, digest);
+	// 	return chain::signature_type();
+	return crypto.Signature{}
+}
+
 //NetPlugin ..
 type NetPlugin struct {
 	netPluginImpl
@@ -99,7 +134,7 @@ func (a *NetPlugin) Initialize() {
 	//从配置里面设置一些初始值
 	println("NetPlugin Initialize")
 	peerLogFormat = config.NodeConf.PeerLogFormat
-	a.SyncMaster.New(config.NodeConf.SyncFetchSpan)
+	a.SyncManager.New(config.NodeConf.SyncFetchSpan)
 	a.ConnectorPeriod = time.Duration(config.NodeConf.ConnectionCleanupPeriod)
 	println(a.ConnectorPeriod)
 	a.MaxCleanupTimeMs = config.NodeConf.MaxCleanupTimeMsec
@@ -237,21 +272,88 @@ func (a *NetPlugin) PluginStartUp() {
 		}
 	}
 
-	a.Listener, err = net.ListenTCP("tcp", laddr)
-	if err != nil {
-		log.AppLog().Error("prot:%s", laddr.Port)
-		log.Assert("net_plugin::plugin_startup failed to bind to port")
-	} else {
-		a.Coon, err = a.Listener.Accept()
+	go func() {
+		a.Listener, err = net.ListenTCP("tcp", laddr)
 		if err != nil {
-			log.Assert("can't accept")
+			log.AppLog().Error("prot:%s", laddr.Port)
+			log.Assert("net_plugin::plugin_startup failed to bind to port")
 		} else {
 			a.StartListenLoop()
 		}
-	}
+	}()
 }
 
 //StartListenLoop ..
 func (a *NetPlugin) StartListenLoop() {
 	println("startListenLoop")
+	newConnection := new(Connection)
+	newConnection.Connecting = true
+	//new_connection->strand.post( [this, new_connection = std::move( new_connection )](){
+	//里面去处理accept，然后递归调用自己，这里的strand可能是要保证执行顺序
+	//}
+	go func() {
+		var err error
+		newConnection.Conn, err = a.Listener.Accept()
+		newConnection.myNetPlugin = a
+		//跟boost的区别就是绑定一个异步的执行函数去执行客户端的请求
+		// acceptor->async_accept( *new_connection->socket,
+		// 	boost::asio::bind_executor( new_connection->strand, [new_connection, socket=new_connection->socket, this]( boost::system::error_code ec ) {}
+		if err != nil {
+			log.AppLog().Error("Error accepting connection:%s", err.Error())
+		} else {
+			go a.handAccept(newConnection)
+			a.StartListenLoop()
+		}
+	}()
+
+	//a.Coon.Read(b)
 }
+
+func (a *NetPlugin) handAccept(conn *Connection) {
+	visitors := 0
+	fromAddr := 0
+	paddrADD := conn.Conn.RemoteAddr()
+	paddrStr := paddrADD.String()
+	f := func() {
+		//for_each_connection( [&visitors, &from_addr, &paddr_str]( auto& conn ) {}
+		//不用像C++那样，捕获参数还要用[]去捕获,入参也不用，比较方便，比较不方便的是不能立即执行，还要f()去调用一下
+		if conn.SocketIsOpen() {
+			if conn.PeerAddress() != "" {
+				visitors++
+				conn.ConnMtx.Lock()
+				if paddrStr == conn.RemoteEndpointIP {
+					fromAddr++
+				}
+				conn.ConnMtx.Unlock()
+			}
+		}
+	}
+
+	f()
+
+	if fromAddr < int(a.MaxNodesPerHost) && (a.MaxClientCount == 0 || visitors < int(a.MaxClientCount)) {
+		log.AppLog().Infof("Accepted new connection:%s", paddrStr)
+		if conn.StartSession() {
+			a.ConnectionsMtx.Lock()
+			defer a.ConnectionsMtx.Unlock()
+			a.Connections = append(a.Connections, conn)
+		}
+	} else {
+		if fromAddr >= int(a.MaxNodesPerHost) {
+			log.AppLog().Debugf("Number of connections %d from %s exceeds limit %d", fromAddr, paddrStr, a.MaxNodesPerHost)
+		} else {
+			log.AppLog().Debugf("ax_client_count %d exceeded", a.MaxClientCount)
+		}
+
+		conn.close(true, false)
+	}
+}
+
+//按顺序执行函数
+// template<typename Function>
+// void for_each_connection( Function f ) {
+//    std::shared_lock<std::shared_mutex> g( my_impl->connections_mtx );
+//    for( auto& c : my_impl->connections ) {
+// 	  if( !f( c ) ) return;
+//    }
+// }

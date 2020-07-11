@@ -1,3 +1,10 @@
 2020-06-23T10:30:04.067+0800	ERROR	chain_plugin/chain_plugin.go:59	error
 2020-06-23T10:30:45.268+0800	ERROR	chain_plugin/chain_plugin.go:60	error
 2020-06-23T10:50:54.888+0800	ERROR	log/logger.go:32	error
+2020-07-11T17:27:09.555+0800	ERROR	log/logger.go:32	HandletHTTP listener is error%!(EXTRA []interface {}=[])
+2020-07-11T17:39:40.737+0800	ERROR	net_plugin/net_plugin.go:278	prot:%s9876
+2020-07-11T17:39:40.737+0800	ERROR	log/logger.go:45	http_plugin::plugin_startup failed to http bind to port
+2020-07-11T17:39:40.737+0800	ERROR	log/logger.go:45	net_plugin::plugin_startup failed to bind to port
+2020-07-11T17:39:51.943+0800	ERROR	net_plugin/net_plugin.go:278	prot:%s9876
+2020-07-11T17:39:51.943+0800	ERROR	log/logger.go:45	net_plugin::plugin_startup failed to bind to port
+2020-07-11T17:46:51.349+0800	ERROR	log/logger.go:45	startSighupHandler

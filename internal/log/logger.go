@@ -28,15 +28,25 @@ func setName() {
 }
 
 //Assert 退出
-func Assert(input ...string) {
+func Assert(input ...interface{}) {
 	var err string
-	for _, s := range input {
-		err += s
-		err += ","
+	var it []interface{}
+	count := 0
+	for _, i := range input {
+		if count == 0 {
+			err = (i).(string)
+		}
+
+		count++
+		it = append(it, i)
 	}
 
-	subLast := err[:len(err)-1]
-	AppLog().Errorf(subLast)
+	if count == 1 {
+		AppLog().Errorf(err)
+	} else {
+		AppLog().Errorf(err, it)
+	}
+
 	os.Exit(-1)
 }
 

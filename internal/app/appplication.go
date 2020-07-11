@@ -88,8 +88,7 @@ func (a *Appplication) SetDataDir(dataDir string) {
 //RegisterPlugin ..
 func (a *Appplication) RegisterPlugin(pluginName string, pluginStruct AbstractPlugin) {
 	if pluginStruct == nil {
-		log.AppLog().Errorf("pluginName is error")
-		os.Exit(-1)
+		log.Assert("pluginName is error")
 	}
 
 	oncePlugin.Do(func() {
@@ -103,13 +102,11 @@ func (a *Appplication) RegisterPlugin(pluginName string, pluginStruct AbstractPl
 func (a *Appplication) FindPlugin(pluginName string) AbstractPlugin {
 	if len(a.plugins) == 0 {
 		log.AppLog().Errorf("plugins is null")
-		os.Exit(-1)
 	}
 
 	plugin, ok := a.plugins[pluginName]
 	if !ok {
-		log.AppLog().Errorf("can't find plugin %s", pluginName)
-		os.Exit(-1)
+		log.Assert("can't find plugin %s", pluginName)
 	}
 
 	return plugin
@@ -140,11 +137,16 @@ func (a *Appplication) StartUp() {
 	exitChan = make(chan os.Signal)
 	signal.Notify(exitChan, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM)
 	go startSighupHandler()
-	for pluginName, plugin := range App().initializedPlugins {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	for pluginName, plugin := range App().plugins {
+		defer wg.Done()
 		plugin.PluginStartUp()
 		plugin.StartUp()
 		a.setRuntingPlugin(pluginName, plugin)
 	}
+
+	wg.Wait()
 }
 
 func startSighupHandler() {
@@ -154,7 +156,7 @@ func startSighupHandler() {
 		plugin.HandleSighup()
 	}
 
-	os.Exit(1)
+	log.Assert("startSighupHandler")
 }
 
 //setRuntingPlugin 设置

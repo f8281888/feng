@@ -2,6 +2,7 @@ package chain
 
 import (
 	"container/list"
+	"feng/internal/fc/common"
 	"feng/internal/fc/crypto"
 )
 
@@ -24,6 +25,23 @@ type BlockHeader struct {
 	newProducers ProducerScheduleType
 	//扩展类型
 	extensionsType map[uint16]list.List
+}
+
+//ID ..
+func (b *BlockHeader) ID() crypto.Sha256 {
+	a := crypto.Sha256{}
+	a.New("0x0000")
+	return a
+}
+
+//numFromID ..
+func (b *BlockHeader) numFromID(id crypto.Sha256) uint32 {
+	return uint32(common.BytesToInt(id.Hash))
+}
+
+//BlockNum ..
+func (b *BlockHeader) BlockNum() uint32 {
+	return b.numFromID(b.previous) + 1
 }
 
 //SignedBlockHeader ..
