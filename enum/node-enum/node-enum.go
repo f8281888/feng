@@ -85,3 +85,10 @@ const (
 	//StagesInSync ..
 	StagesInSync = iota
 )
+
+const (
+	//Porducing ..
+	Porducing = iota
+	//Speculating ..
+	Speculating = iota
+)

@@ -58,3 +58,12 @@ func BytesToBool(b []byte) bool {
 	binary.Read(bytesBuffer, binary.LittleEndian, &x)
 	return x
 }
+
+//BytesToUint64 ..
+func BytesToUint64(b []byte) uint64 {
+	bytesBuffer := bytes.NewBuffer(b)
+	var x uint64
+	binary.Read(bytesBuffer, binary.LittleEndian, &x)
+
+	return uint64(x)
+}

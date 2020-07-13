@@ -29,5 +29,6 @@
   "verboseHttpErrors":false,
   "httpThreads":2,
   "httpMaxBytesInFlightMb": 500,
-  "httpMaxResponseTimeMs":30
+  "httpMaxResponseTimeMs":30,
+  "privateKey":[]
 }

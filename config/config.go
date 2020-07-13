@@ -47,6 +47,7 @@ type NodeConfig struct {
 	HTTPThreads               uint16            `json:"httpThreads"`
 	HTTPMaxBytesInFlightMb    uint32            `json:"httpMaxBytesInFlightMb"`
 	HTTPMaxResponseTimeMs     uint32            `json:"httpMaxResponseTimeMs"`
+	PrivateKey                []string          `json:"privateKey"`
 }
 
 //InitConfig 初始化配置
