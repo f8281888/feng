@@ -5,6 +5,11 @@ type PrivateKey struct {
 	key string
 }
 
+//Tostring ..
+func (p *PrivateKey) Tostring() string {
+	return p.key
+}
+
 //NewPrivateKey ..
 func NewPrivateKey(key string) PrivateKey {
 	p := PrivateKey{}

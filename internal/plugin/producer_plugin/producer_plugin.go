@@ -13,6 +13,8 @@ import (
 	chainplugin "feng/internal/plugin/chain_plugin"
 	"feng/internal/pool"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -133,11 +135,14 @@ func QuerySnapshotData(t PendingSnapshotIndexIndex, blkID chain.BlockIDType, hei
 	}
 }
 
+//SignatureProviderType ..
+type SignatureProviderType = func(digist chain.DigestType) chain.SignatureType
+
 //Impl ..
 type Impl struct {
 	ProductionEnabled                     bool
 	PauseProduction                       bool
-	SignatureProviders                    map[crypto.PublicKey]crypto.Signature
+	SignatureProviders                    map[crypto.PublicKey]SignatureProviderType
 	Producers                             []chain.AccountName
 	Timer                                 time.Time
 	ProducerWatermarks                    map[chain.AccountName]stl.Pair
@@ -170,6 +175,7 @@ type Impl struct {
 	TimerCorelationID             uint32
 	IncomingDeferRatio            float64
 	SnapshotsDir                  string
+	PendingIncomingTransactions   IncomingTransactionQueue
 }
 
 //ProducerPlugin ..
@@ -214,22 +220,178 @@ func (a *ProducerPlugin) Initialize() {
 		for _, keyIDToWifPairString := range keyIDToWifPairStrings {
 			//KEY  是一个json 格式的
 			key := Key{}
-			keyIDToWifPair := json.Unmarshal([]byte(keyIDToWifPairString), &key)
+			json.Unmarshal([]byte(keyIDToWifPairString), &key)
 			a.SignatureProviders[key.PublicKey] = a.MakeKeySignatureProvider(key.PrivateKey)
+			var blankedPrivkey string
+			for _, i := range key.PrivateKey.Tostring() {
+				blankedPrivkey += string("*")
+				i++
+			}
 
+			log.AppLog().Infof("\"private-key\" is DEPRECATED, use \"signature-provider=%s=KEY:%s\"", key.PublicKey.ToString(), blankedPrivkey)
 		}
 	}
 
-}
+	//EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+	if len(config.NodeConf.SignatureProvider) > 0 {
+		keySpecPairs := config.NodeConf.SignatureProvider
+		for _, keySpecPair := range keySpecPairs {
+			delim := strings.Index(keySpecPair, "=")
+			if delim <= 0 {
+				log.Assert("Missing \"=\" in the key spec pair")
+			}
 
-//SignatureProviderType ..
-type SignatureProviderType = func(digist chain.DigestType) chain.SignatureType
+			pubKeyStr := keySpecPair[0:delim]
+			specStr := keySpecPair[delim+1:]
+			specDelim := strings.Index(specStr, "=")
+			if specDelim <= 0 {
+				log.Assert("Missing \":\" in the key spec pair")
+			}
+
+			specTypeStr := specStr[0:specDelim]
+			specData := specStr[specDelim+1:]
+			pubkey := crypto.NewPublicKey(pubKeyStr)
+
+			specDataKey := crypto.NewPrivateKey(specData)
+			if specTypeStr == "KEY" {
+				a.SignatureProviders[pubkey] = a.MakeKeySignatureProvider(specDataKey)
+			} else if specTypeStr == "KEOSD" {
+				a.SignatureProviders[pubkey] = a.MakeKeySignatureProvider(specDataKey)
+				//TODO跳过
+				//my->_signature_providers[pubkey] = make_keosd_signature_provider(my, spec_data, pubkey);
+			}
+		}
+	}
+
+	a.KeosdProviderTimeoutUs = time.Millisecond * time.Duration(config.NodeConf.KeosdProviderTimeout)
+	a.ProduceTimeOffsetUs = config.NodeConf.ProduceTimeOffsetUs
+	if a.ProduceTimeOffsetUs > 0 && int(a.ProduceTimeOffsetUs) < -chain.BlockIntervalUs {
+		log.Assert("produce-time-offset-us %d must be 0 .. -%d", chain.BlockIntervalUs, a.ProduceTimeOffsetUs)
+	}
+
+	a.LastBlockTimeOffsetUs = config.NodeConf.ProduceTimeOffsetUs
+	if a.LastBlockTimeOffsetUs > 0 && int(a.LastBlockTimeOffsetUs) < -chain.BlockIntervalUs {
+		log.Assert("last-block-time-offset-us %d must be 0 .. -%d", chain.BlockIntervalUs, a.ProduceTimeOffsetUs)
+	}
+
+	cpuEffortPct := config.NodeConf.CPUEffortPercent
+	if cpuEffortPct == 0 {
+		cpuEffortPct = chain.DefaultBlockCPUEffortPct / uint32(chain.Percent1)
+	}
+
+	if cpuEffortPct < 0 && cpuEffortPct > 100 {
+		log.Assert("cpu-effort-percent %d must be 0 - 100", cpuEffortPct)
+	}
+
+	cpuEffortPct *= uint32(chain.Percent1)
+
+	CPUEffortOffsetUs := -chain.FengPrercent(uint64(chain.BlockIntervalUs), uint32(chain.Percent100)-uint32(cpuEffortPct))
+
+	lastBlockCPUEffortPct := config.NodeConf.LastBlockCPUEffortPct
+	if lastBlockCPUEffortPct == 0 {
+		lastBlockCPUEffortPct = chain.DefaultBlockCPUEffortPct / uint32(chain.Percent1)
+	}
+
+	if lastBlockCPUEffortPct < 0 && lastBlockCPUEffortPct > 100 {
+		log.Assert("last-block-cpu-effort-percent %d must be 0 - 100", lastBlockCPUEffortPct)
+	}
+
+	lastBlockCPUEffortPct *= uint32(chain.Percent1)
+	lastBlockCPUEffortOffsetUs := -chain.FengPrercent(uint64(chain.BlockIntervalUs), uint32(chain.Percent100)-uint32(lastBlockCPUEffortPct))
+	a.ProduceTimeOffsetUs = int32(common.Min(int(a.ProduceTimeOffsetUs), int(CPUEffortOffsetUs)))
+	a.LastBlockTimeOffsetUs = int32(common.Min(int(a.LastBlockTimeOffsetUs), int(lastBlockCPUEffortOffsetUs)))
+	a.MaxBlockCPUUsageThresholdUs = config.NodeConf.MaxBlockCPUUsageThresholdUs
+	if a.MaxBlockCPUUsageThresholdUs == 0 {
+		a.MaxBlockCPUUsageThresholdUs = 500
+	}
+
+	if int(a.MaxBlockCPUUsageThresholdUs) >= chain.BlockIntervalUs {
+		log.Assert("max-block-cpu-usage-threshold-us %d  must be 0  %d", chain.BlockIntervalUs, a.MaxBlockCPUUsageThresholdUs)
+	}
+
+	a.MaxBlockNetUsageThresholdBytes = config.NodeConf.MaxBlockNetUsageThresholdBytes
+	if a.MaxBlockNetUsageThresholdBytes == 0 {
+		a.MaxBlockNetUsageThresholdBytes = 1024
+	}
+
+	a.MaxScheduledTransactionTimePerBlockMs = int32(config.NodeConf.MaxScheduledTransactionTimePerBlockMs)
+
+	if a.MaxScheduledTransactionTimePerBlockMs == 0 {
+		a.MaxScheduledTransactionTimePerBlockMs = 100
+	}
+
+	subjectiveCPULeewayUs := config.NodeConf.SubjectiveCPULeewayUs
+	if subjectiveCPULeewayUs != 0 && subjectiveCPULeewayUs != chain.DefaultSubjectiveCPULeewayUs {
+		myChain.SetSubjectiveCPULeeway(time.Duration(subjectiveCPULeewayUs) * time.Microsecond)
+	}
+
+	a.MaxTransactionTimeMs = config.NodeConf.MaxTransactionTime
+	a.MaxIrreversibleBlockAgeUs = time.Duration(config.NodeConf.MaxIrreversibleBlockAge) * time.Second
+	if config.NodeConf.IncomingTransactionQueueSizeMb == 0 {
+		config.NodeConf.IncomingTransactionQueueSizeMb = 1024
+	}
+
+	maxIncomingTransactionQueueSize := config.NodeConf.IncomingTransactionQueueSizeMb * 1024 * 1024
+
+	if maxIncomingTransactionQueueSize <= 0 {
+		log.Assert("incoming-transaction-queue-size-mb %d must be greater than 0", maxIncomingTransactionQueueSize)
+	}
+
+	a.PendingIncomingTransactions.SetMaxIncomingTransactionQueueSize(uint64(maxIncomingTransactionQueueSize))
+
+	a.IncomingDeferRatio = config.NodeConf.IncomingDeferRatio
+	threadPoolSize := config.NodeConf.ProducerThreads
+	if threadPoolSize == 0 {
+		threadPoolSize = chain.DefaultControllerThreadPoolSize
+	}
+
+	a.ThreadPool.PoolSize = int(threadPoolSize)
+	if config.NodeConf.SnapshotsDir == "" {
+		config.NodeConf.SnapshotsDir = "snapshots"
+	}
+
+	a.SnapshotsDir = app.App().GetDataDir() + "/" + config.NodeConf.SnapshotsDir
+	s, err := os.Stat(a.SnapshotsDir)
+	if err == nil {
+		if s.IsDir() {
+			log.Assert("No such directory %s", a.SnapshotsDir)
+		}
+	} else {
+		if !os.IsExist(err) {
+			os.Mkdir(a.SnapshotsDir, 666)
+		}
+	}
+}
 
 //MakeKeySignatureProvider ..
 func (a *ProducerPlugin) MakeKeySignatureProvider(key chain.PrivateKeType) SignatureProviderType {
 	return func(digist chain.DigestType) chain.SignatureType {
 		return key.Sign(digist)
 	}
+}
+
+//MakeKeosdSignatureProvider TODO 先跳过
+func (a *ProducerPlugin) MakeKeosdSignatureProvider(impl *Impl, urlStr string, pubkey chain.PublicKeyType) {
+	//var keosdUrl url.URL
+	// if(boost::algorithm::starts_with(url_str, "unix://"))
+	//    //send the entire string after unix:// to http_plugin. It'll auto-detect which part
+	//    // is the unix socket path, and which part is the url to hit on the server
+	//    keosd_url = fc::url("unix", url_str.substr(7), ostring(), ostring(), ostring(), ostring(), ovariant_object(), fc::optional<uint16_t>());
+	// else
+	//    keosd_url = fc::url(url_str);
+	// std::weak_ptr<producer_plugin_impl> weak_impl = impl;
+
+	// return [weak_impl, keosd_url, pubkey]( const chain::digest_type& digest ) {
+	//    auto impl = weak_impl.lock();
+	//    if (impl) {
+	// 	  fc::variant params;
+	// 	  fc::to_variant(std::make_pair(digest, pubkey), params);
+	// 	  auto deadline = impl->_keosd_provider_timeout_us.count() >= 0 ? fc::time_point::now() + impl->_keosd_provider_timeout_us : fc::time_point::maximum();
+	// 	  return app().get_plugin<http_client_plugin>().get_client().post_sync(keosd_url, params, deadline).as<chain::signature_type>();
+	//    } else {
+	// 	  return signature_type();
+	//    }
+	// };
 }
 
 //HandleSighup ..

@@ -30,5 +30,12 @@
   "httpThreads":2,
   "httpMaxBytesInFlightMb": 500,
   "httpMaxResponseTimeMs":30,
-  "privateKey":[]
+  "privateKey":[],
+  "signatureProvider ":["EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"],
+  "keosdProviderTimeout":5,
+  "produceTimeOffsetUs": 0,
+  "lastBlockTimeOffsetUs" : 0,
+  "maxTransactionTime":30,
+  "maxIrreversibleBlockAge":-1,
+  "incomingDeferRatio" : 1
 }

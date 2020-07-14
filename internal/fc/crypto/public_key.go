@@ -11,3 +11,8 @@ func NewPublicKey(key string) PublicKey {
 	p.key = key
 	return p
 }
+
+//ToString ..
+func (p PublicKey) ToString() string {
+	return p.key
+}

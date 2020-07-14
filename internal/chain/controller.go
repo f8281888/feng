@@ -6,6 +6,7 @@ import (
 	"feng/internal/chainbase"
 	"feng/internal/fc/crypto"
 	"feng/internal/log"
+	"time"
 )
 
 //ControllerConfig ..
@@ -166,4 +167,9 @@ func (c Controller) StartUpSingle(b func() bool) {
 //GetReadMode ..
 func (c Controller) GetReadMode() uint16 {
 	return c.DBReadMode
+}
+
+//SetSubjectiveCPULeeway ..
+func (c *Controller) SetSubjectiveCPULeeway(t time.Duration) {
+	c.subjectiveCPULeeway = uint64(t)
 }

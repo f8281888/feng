@@ -25,29 +25,45 @@ type NodeConfig struct {
 	//最大连接数量
 	MaxClients uint32 `json:"maxClients"`
 	//一个ip地址最多可以连接的节点数量
-	P2pMaxNodesPerHost        uint32            `json:"p2pMaxNodesPerHost"`
-	P2pAcceptTransactions     bool              `json:"p2pAcceptTransactions"`
-	UseSocketReadWatermark    bool              `json:"useSocketReadWatermark"`
-	P2pListenEndpoint         string            `json:"p2pListenEndpoint"`
-	P2pServerAddress          string            `json:"p2pServerAddress"`
-	NetThreads                uint16            `json:"netThreads"`
-	P2pPeerAddress            []string          `json:"p2pPeerAddress"`
-	AgentName                 string            `json:"agentName"`
-	AllowedConnection         []string          `json:"allowedConnection"`
-	PeerKey                   []string          `json:"peerKey"`
-	PeerPrivateKey            map[string]string `json:"peerPrivateKey"`
-	HTTPValidateHost          bool              `json:"httpValidateHost"`
-	HTTPAlias                 []string          `json:"httpAlias"`
-	HTTPServerAddress         string            `json:"httpServerAddress"`
-	HTTPSCertificateChainFile string            `json:"httpsCertificateChainFile"`
-	HTTPSServerAddress        string            `json:"httpsServerAddress"`
-	HTTPSPrivateKeyFile       string            `json:"httpsPrivateKeyFile"`
-	MaxBodySize               uint32            `json:"maxBodySize"`
-	VerboseHTTPErrors         bool              `json:"verboseHttpErrors"`
-	HTTPThreads               uint16            `json:"httpThreads"`
-	HTTPMaxBytesInFlightMb    uint32            `json:"httpMaxBytesInFlightMb"`
-	HTTPMaxResponseTimeMs     uint32            `json:"httpMaxResponseTimeMs"`
-	PrivateKey                []string          `json:"privateKey"`
+	P2pMaxNodesPerHost                    uint32            `json:"p2pMaxNodesPerHost"`
+	P2pAcceptTransactions                 bool              `json:"p2pAcceptTransactions"`
+	UseSocketReadWatermark                bool              `json:"useSocketReadWatermark"`
+	P2pListenEndpoint                     string            `json:"p2pListenEndpoint"`
+	P2pServerAddress                      string            `json:"p2pServerAddress"`
+	NetThreads                            uint16            `json:"netThreads"`
+	P2pPeerAddress                        []string          `json:"p2pPeerAddress"`
+	AgentName                             string            `json:"agentName"`
+	AllowedConnection                     []string          `json:"allowedConnection"`
+	PeerKey                               []string          `json:"peerKey"`
+	PeerPrivateKey                        map[string]string `json:"peerPrivateKey"`
+	HTTPValidateHost                      bool              `json:"httpValidateHost"`
+	HTTPAlias                             []string          `json:"httpAlias"`
+	HTTPServerAddress                     string            `json:"httpServerAddress"`
+	HTTPSCertificateChainFile             string            `json:"httpsCertificateChainFile"`
+	HTTPSServerAddress                    string            `json:"httpsServerAddress"`
+	HTTPSPrivateKeyFile                   string            `json:"httpsPrivateKeyFile"`
+	MaxBodySize                           uint32            `json:"maxBodySize"`
+	VerboseHTTPErrors                     bool              `json:"verboseHttpErrors"`
+	HTTPThreads                           uint16            `json:"httpThreads"`
+	HTTPMaxBytesInFlightMb                uint32            `json:"httpMaxBytesInFlightMb"`
+	HTTPMaxResponseTimeMs                 uint32            `json:"httpMaxResponseTimeMs"`
+	PrivateKey                            []string          `json:"privateKey"`
+	SignatureProvider                     []string          `json:"signatureProvider"`
+	KeosdProviderTimeout                  uint32            `json:"keosdProviderTimeout"`
+	ProduceTimeOffsetUs                   int32             `json:"produceTimeOffsetUs"`
+	LastBlockTimeOffsetUs                 int32             `json:"lastBlockTimeOffsetUs"`
+	CPUEffortPercent                      uint32            `json:"cpuEffortPercent"`
+	LastBlockCPUEffortPct                 uint32            `json:"lastBlockCPUEffortPct"`
+	MaxBlockCPUUsageThresholdUs           uint32            `json:"maxBlockCPUUsageThresholdUs"`
+	MaxBlockNetUsageThresholdBytes        uint32            `json:"maxBlockNetUsageThresholdBytes"`
+	MaxScheduledTransactionTimePerBlockMs uint32            `json:"maxScheduledTransactionTimePerBlockMs"`
+	SubjectiveCPULeewayUs                 uint32            `json:"subjectiveCPULeewayUs"`
+	MaxTransactionTime                    uint32            `json:"maxTransactionTime"`
+	MaxIrreversibleBlockAge               int32             `json:"maxIrreversibleBlockAge"`
+	IncomingTransactionQueueSizeMb        int16             `json:"incomingTransactionQueueSizeMb"`
+	IncomingDeferRatio                    float64           `json:"incomingDeferRatio"`
+	ProducerThreads                       int16             `json:"producerThreads"`
+	SnapshotsDir                          string            `json:"snapshotsDir"`
 }
 
 //InitConfig 初始化配置
