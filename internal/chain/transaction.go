@@ -42,6 +42,7 @@ func (t *TransactionHeader) SetReferenceBlock(referenceBlock BlockIDType) {
 
 //Transaction 一个事务可以由多个action 组成
 type Transaction struct {
+	TransactionHeader
 	ContextFreeActions    []Action
 	Actions               []Action
 	TransactionExtensions []stl.Pair
@@ -49,6 +50,7 @@ type Transaction struct {
 
 //SignedTransaction ..
 type SignedTransaction struct {
+	Transaction
 	Signatures      []SignatureType
 	ContextFreeData []byte
 }
@@ -66,4 +68,9 @@ type PackedTransaction struct {
 //ID ..
 func (p PackedTransaction) ID() *TransactionIDType {
 	return &p.trxID
+}
+
+//Expiration ..
+func (p PackedTransaction) Expiration() time.Duration {
+	return p.unpackedTrx.Expiration
 }

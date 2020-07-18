@@ -2,7 +2,6 @@ package chain
 
 import (
 	"feng/internal/log"
-	"fmt"
 	"time"
 )
 
@@ -46,36 +45,38 @@ type UnappliedKey struct {
 }
 
 //UnappliedTrxQueueType ..
-type UnappliedTrxQueueType map[UnappliedKey]UnappliedTransaction
+type UnappliedTrxQueueType map[*TransactionIDType]UnappliedTransaction
 
-// BuildSnapshotIndex 构建查询索引
-func BuildSnapshotIndex(t UnappliedTrxQueueType, list []UnappliedTransaction) {
-	// 遍历所有数据
-	for _, profile := range list {
-		// 构建查询键
-		key := UnappliedKey{
-			ID:          profile.TrxMeta.ID(),
-			Expirty:     profile.Expirty,
-			TrxEnumType: profile.TrxEnumType,
-		}
+//type UnappliedTrxQueueType map[UnappliedKey]UnappliedTransaction
 
-		// 保存查询键
-		t[key] = profile
-	}
-}
+// // BuildSnapshotIndex 构建查询索引
+// func BuildSnapshotIndex(t UnappliedTrxQueueType, list []UnappliedTransaction) {
+// 	// 遍历所有数据
+// 	for _, profile := range list {
+// 		// 构建查询键
+// 		key := UnappliedKey{
+// 			ID:          profile.TrxMeta.ID(),
+// 			Expirty:     profile.Expirty,
+// 			TrxEnumType: profile.TrxEnumType,
+// 		}
 
-// QuerySnapshotData 根据条件查询数据
-func QuerySnapshotData(u UnappliedTrxQueueType, key UnappliedKey) {
-	// 根据键值查询数据
-	result, ok := u[key]
+// 		// 保存查询键
+// 		t[key] = profile
+// 	}
+// }
 
-	// 找到数据打印出来
-	if ok {
-		fmt.Println(result)
-	} else {
-		fmt.Println("no found")
-	}
-}
+// // QuerySnapshotData 根据条件查询数据
+// func QuerySnapshotData(u UnappliedTrxQueueType, key UnappliedKey) {
+// 	// 根据键值查询数据
+// 	result, ok := u[key]
+
+// 	// 找到数据打印出来
+// 	if ok {
+// 		fmt.Println(result)
+// 	} else {
+// 		fmt.Println("no found")
+// 	}
+// }
 
 //UnappliedTransactionQueue ..
 type UnappliedTransactionQueue struct {
@@ -96,4 +97,18 @@ func (u *UnappliedTransactionQueue) SetMode(newMode uint32) {
 
 func (u *UnappliedTransactionQueue) empty() bool {
 	return len(u.queue) <= 0
+}
+
+//AddAborted ..
+func (u *UnappliedTransactionQueue) AddAborted(abortedTrxs []*TransactionMetadata) {
+	if u.mode == NonSpeculative || u.mode == SpeculativeNonProducer {
+		return
+	}
+
+	for _, trx := range abortedTrxs {
+		expiry := trx.PackedTrx().Expiration()
+		tmp := UnappliedTransaction{TrxMeta: trx, Expirty: expiry, TrxEnumType: Aborted}
+		// queue.insert( { std::move( trx ), expiry, trx_enum_type::aborted } ); 多索引容器插入一条数据。。
+		u.queue[trx.ID()] = tmp
+	}
 }

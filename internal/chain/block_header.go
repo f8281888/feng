@@ -9,7 +9,7 @@ import (
 //BlockHeader 头
 type BlockHeader struct {
 	//时间戳 生成区块的时间
-	timestamp BlockTimestamp
+	Tmestamp BlockTimestamp
 	//生产区块的节点
 	producer Name
 	//区块的确认数
@@ -46,7 +46,7 @@ func (b *BlockHeader) BlockNum() uint32 {
 
 //SignedBlockHeader ..
 type SignedBlockHeader struct {
-	blockHeader       BlockHeader
+	BlockHeader
 	producerSignature string
 }
 

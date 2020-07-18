@@ -29,3 +29,8 @@ type TransactionMetadata struct {
 func (t TransactionMetadata) ID() *TransactionIDType {
 	return t.packedTrx.ID()
 }
+
+//PackedTrx ..
+func (t TransactionMetadata) PackedTrx() *PackedTransaction {
+	return t.packedTrx
+}

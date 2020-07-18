@@ -8,3 +8,7 @@
 2020-07-11T17:39:51.943+0800	ERROR	net_plugin/net_plugin.go:278	prot:%s9876
 2020-07-11T17:39:51.943+0800	ERROR	log/logger.go:45	net_plugin::plugin_startup failed to bind to port
 2020-07-11T17:46:51.349+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-14T20:36:54.744+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-17T16:29:42.033+0800	ERROR	log/logger.go:45	ForkDB is null
+2020-07-17T16:40:04.610+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-17T16:45:02.807+0800	ERROR	log/logger.go:45	startSighupHandler

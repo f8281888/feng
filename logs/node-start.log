@@ -596,3 +596,47 @@
 2020-07-11T17:40:06.673+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
 2020-07-11T17:46:51.347+0800	INFO	app/appplication.go:154	receive signal :interrupt
 2020-07-11T17:46:51.349+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-14T20:36:47.913+0800	INFO	node/start.go:23	node start
+2020-07-14T20:36:47.914+0800	INFO	node/node.go:18	node business start
+2020-07-14T20:36:47.914+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-14T20:36:47.914+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-14T20:36:47.914+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-14T20:36:47.914+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-14T20:36:47.914+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-14T20:36:47.914+0800	INFO	chain/controller.go:103	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-14T20:36:47.914+0800	INFO	chain/controller.go:155	Initializing new blockchain with genesis state
+2020-07-14T20:36:47.914+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-14T20:36:54.744+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-14T20:36:54.744+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-17T16:29:42.032+0800	INFO	node/start.go:23	node start
+2020-07-17T16:29:42.032+0800	INFO	node/node.go:18	node business start
+2020-07-17T16:29:42.032+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-17T16:29:42.033+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-17T16:29:42.033+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-17T16:29:42.033+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-17T16:29:42.033+0800	ERROR	log/logger.go:45	ForkDB is null
+2020-07-17T16:37:53.541+0800	INFO	node/start.go:23	node start
+2020-07-17T16:37:53.542+0800	INFO	node/node.go:18	node business start
+2020-07-17T16:37:53.542+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-17T16:37:53.542+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-17T16:37:53.542+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-17T16:37:53.542+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-17T16:37:53.542+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-17T16:37:53.542+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-17T16:37:53.542+0800	INFO	chain/controller.go:103	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-17T16:37:53.542+0800	INFO	chain/controller.go:155	Initializing new blockchain with genesis state
+2020-07-17T16:40:04.610+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-17T16:40:04.610+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-17T16:41:14.145+0800	INFO	node/start.go:23	node start
+2020-07-17T16:41:14.146+0800	INFO	node/node.go:18	node business start
+2020-07-17T16:41:14.146+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-17T16:41:14.146+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-17T16:41:14.146+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-17T16:41:14.146+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-17T16:41:14.146+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[]}
+2020-07-17T16:41:14.146+0800	INFO	chain/controller.go:103	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-17T16:41:14.146+0800	INFO	chain/controller.go:155	Initializing new blockchain with genesis state
+2020-07-17T16:41:14.147+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-17T16:44:33.779+0800	INFO	net_plugin/net_plugin.go:335	Accepted new connection:10.0.0.49:57409
+2020-07-17T16:45:02.806+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-17T16:45:02.807+0800	ERROR	log/logger.go:45	startSighupHandler

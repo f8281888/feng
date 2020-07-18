@@ -2,7 +2,7 @@ package chain
 
 //BlockTimestamp BlockTimestamp
 type BlockTimestamp struct {
-	time                uint32
+	time                uint64
 	blockIntervalMs     uint16
 	blockTimestampEpoch uint64
 }
@@ -10,4 +10,9 @@ type BlockTimestamp struct {
 //Next 下一秒
 func (b *BlockTimestamp) Next() {
 	b.time++
+}
+
+//Time ..
+func (b *BlockTimestamp) Time() uint64 {
+	return b.time
 }

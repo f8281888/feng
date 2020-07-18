@@ -51,12 +51,64 @@ type ControllerConfig struct {
 	// unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
 }
 
+//MaybeSession ..
+type MaybeSession struct {
+	session chainbase.Session
+}
+
+//BuildingBlock ..
+type BuildingBlock struct {
+	PendingTrxMetas []*TransactionMetadata
+}
+
+//AssembledBlock ..
+type AssembledBlock struct {
+	TrxMetas []*TransactionMetadata
+}
+
+//CompledBlock ..
+type CompledBlock struct {
+	blockState *BlockState
+}
+
+//BlockStageType ..
+type BlockStageType struct {
+	buildingBlock   *BuildingBlock
+	assembledBlock  *AssembledBlock
+	compledBlock    *CompledBlock
+	blockStatus     uint32
+	producerBlockID BlockIDType
+}
+
+//PendingState ..
+type PendingState struct {
+	dbSession  MaybeSession
+	blockState BlockStageType
+}
+
+//ExtractTrxMetas ..
+func (p *PendingState) ExtractTrxMetas() []*TransactionMetadata {
+	if p.blockState.buildingBlock != nil {
+		if len(p.blockState.buildingBlock.PendingTrxMetas) > 0 {
+			return p.blockState.buildingBlock.PendingTrxMetas
+		}
+	}
+
+	if p.blockState.assembledBlock != nil {
+		if len(p.blockState.assembledBlock.TrxMetas) > 0 {
+			return p.blockState.assembledBlock.TrxMetas
+		}
+	}
+
+	return p.blockState.compledBlock.blockState.ExtractTrxsMetas()
+}
+
 //ControllerImpl ..
 type ControllerImpl struct {
-	DB                             chainbase.ChainBase
-	reversibleBlocks               chainbase.ChainBase
+	DB                             chainbase.DataBase
+	reversibleBlocks               chainbase.DataBase
 	self                           *Controller
-	ForkDB                         ForkDatabase
+	ForkDB                         *ForkDatabase
 	conf                           ControllerConfig
 	inTrxRequiringChecks           bool
 	trustedProducerLightValidation bool
@@ -65,6 +117,8 @@ type ControllerImpl struct {
 	readMode                       uint16
 	head                           *BlockState
 	Blog                           BlockLog
+	pending                        *PendingState
+	protocolFeatures               ProtocolFeatureManager
 }
 
 //Controller ..
@@ -75,7 +129,7 @@ type Controller struct {
 
 //StartUp ..
 func (c Controller) StartUp(b func() bool, genesis GenesisState) {
-	if c.DB == (chainbase.ChainBase{}) {
+	if c.DB == (chainbase.DataBase{}) {
 		log.Assert("ChainBase is null")
 	}
 
@@ -89,7 +143,7 @@ func (c Controller) StartUp(b func() bool, genesis GenesisState) {
 			string(genesisChainID.sha256.Hash), string(genesisChainID.sha256.Hash))
 	}
 
-	if c.ForkDB == (ForkDatabase{}) {
+	if c.ForkDB == nil {
 		log.Assert("ForkDB is null")
 	}
 
@@ -172,4 +226,53 @@ func (c Controller) GetReadMode() uint16 {
 //SetSubjectiveCPULeeway ..
 func (c *Controller) SetSubjectiveCPULeeway(t time.Duration) {
 	c.subjectiveCPULeeway = uint64(t)
+}
+
+//FetchBlockByID ..
+func (c *Controller) FetchBlockByID(id BlockIDType) *SignedBlock {
+	state := c.ForkDB.GetBlock(id)
+	if state != nil && state.block != nil {
+		return state.block
+	}
+
+	return nil
+}
+
+//FetchBlockByNumer ..
+func (c *Controller) FetchBlockByNumer(blockNum uint32) *BlockState {
+	return nil
+}
+
+//FetchBlockStateByNumer ..
+func (c *Controller) FetchBlockStateByNumer(blockNum uint32) *BlockState {
+	//revBlocks := c.reversibleBlocks
+	return nil
+}
+
+//CreateBlockStateFuture ..
+func (c *Controller) CreateBlockStateFuture(b *SignedBlock) *BlockState {
+	//revBlocks := c.reversibleBlocks
+	return nil
+}
+
+//AbortBlock ..
+func (c *Controller) AbortBlock() []*TransactionMetadata {
+	var appliedTrxs []*TransactionMetadata
+	if c.pending != nil {
+		appliedTrxs = c.pending.ExtractTrxMetas()
+		//pending.reset();
+		c.protocolFeatures.PoppedBlocksTo(c.head.BlockNum)
+	}
+
+	return appliedTrxs
+}
+
+//HeadBlockState ..
+func (c Controller) HeadBlockState() *BlockState {
+	return c.head
+}
+
+//HeadBlockTime ..
+func (c Controller) HeadBlockTime() uint64 {
+	return c.head.header.Tmestamp.Time()
 }

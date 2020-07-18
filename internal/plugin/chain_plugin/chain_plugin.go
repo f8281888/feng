@@ -53,16 +53,15 @@ func (a *ChainPlugin) Initialize() {
 	a.genesis = &gs
 	a.chain = chain.Controller{}
 	a.chainConfig = chain.ControllerConfig{}
-	a.chain.DB = chainbase.ChainBase{}
+	a.chain.DB = chainbase.DataBase{}
 	a.chain.DB.SetRversion(1)
 	a.chain.ChainID = chain.CIDType{}
 	s := &crypto.Sha256{}
 	s.Hash = []byte("1")
 	a.chain.ChainID.SetCIDType(s)
-	a.chain.ForkDB = chain.ForkDatabase{}
+	a.chain.ForkDB = new(chain.ForkDatabase)
 	fork := &chain.ForkDatabaseImpl{}
 	fork.DataDir = "/data"
-	a.chain.ForkDB.Set(fork)
 }
 
 //HandleSighup ..

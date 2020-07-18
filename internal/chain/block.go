@@ -28,6 +28,7 @@ type TransactionReceipt struct {
 
 //SignedBlock ..
 type SignedBlock struct {
+	SignedBlockHeader
 	transactions []TransactionReceipt
 }
 

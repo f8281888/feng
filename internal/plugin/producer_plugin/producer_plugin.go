@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"feng/config"
 	controllerenum "feng/enum/controller-enum"
+	nodeenum "feng/enum/node-enum"
 	"feng/internal/app"
 	"feng/internal/chain"
 	"feng/internal/fc/common"
@@ -161,7 +162,7 @@ type Impl struct {
 	ProtocolFeaturesToActivate            []chain.DigestType
 	PotocolFeaturesSignaled               bool
 	ChainPlugin                           *chainplugin.ChainPlugin
-	IncomingBlockSubscription             chan chain.SignedBlock
+	IncomingBlockSubscription             func(chan chain.SignedBlock)
 	IncomingTransactionSubscription       chan chain.SignedTransaction
 	TransactionAckChannel                 chan chain.TransactionMetadata
 	IncomingBlockSyncProvider             chan chain.SignedBlock
@@ -327,11 +328,12 @@ func (a *ProducerPlugin) Initialize() {
 
 	a.MaxTransactionTimeMs = config.NodeConf.MaxTransactionTime
 	a.MaxIrreversibleBlockAgeUs = time.Duration(config.NodeConf.MaxIrreversibleBlockAge) * time.Second
-	if config.NodeConf.IncomingTransactionQueueSizeMb == 0 {
-		config.NodeConf.IncomingTransactionQueueSizeMb = 1024
+	incomingTransactionQueueSizeMb := uint64(config.NodeConf.IncomingTransactionQueueSizeMb)
+	if incomingTransactionQueueSizeMb == 0 {
+		incomingTransactionQueueSizeMb = 1024
 	}
 
-	maxIncomingTransactionQueueSize := config.NodeConf.IncomingTransactionQueueSizeMb * 1024 * 1024
+	var maxIncomingTransactionQueueSize uint64 = 1024 * 1024 * incomingTransactionQueueSizeMb
 
 	if maxIncomingTransactionQueueSize <= 0 {
 		log.Assert("incoming-transaction-queue-size-mb %d must be greater than 0", maxIncomingTransactionQueueSize)
@@ -361,6 +363,93 @@ func (a *ProducerPlugin) Initialize() {
 			os.Mkdir(a.SnapshotsDir, 666)
 		}
 	}
+
+	a.IncomingBlockSubscription = func(block chan chain.SignedBlock) {
+		t := <-block
+		a.OnIncomingBlock(t, nil)
+	}
+}
+
+const (
+	//Succeeded ..
+	Succeeded = iota
+	//Failed ..
+	Failed= iota
+	//WaitingForBlock ..
+	WaitingForBlock= iota
+	//WaitingForProduction ..
+	WaitingForProduction= iota
+	//Exhausted ..
+	Exhausted= iota
+)
+
+func   (a *ProducerPlugin) calculatePendingBlockTime() time.Duration {
+	myChain = a.ChainPlugin.GetChain()
+	now := time.Now().Unix()
+	base := common.Max(now, myChain.HeadBlockTime)
+	minTimeToNextBlock := 
+	// const int64_t min_time_to_next_block = (config::block_interval_us) - (base.time_since_epoch().count() % (config::block_interval_us) );
+	// fc::time_point block_time = base + fc::microseconds(min_time_to_next_block);
+	// return block_time;
+ }
+
+func (a *ProducerPlugin) StartBlock() uint32{
+	myChain := a.ChainPlugin.GetChain()
+	if !a.ChainPlugin.AcceptTransactions(){
+		return WaitingForBlock
+	}
+
+	hbs := myChain.HeadBlockState()
+	now := time.Now()
+	blockTime := 
+}
+
+//ScheduleProductionLoop ..
+func (a *ProducerPlugin) ScheduleProductionLoop() {
+	a.Timer.Clock()
+	result := 
+}
+
+//OnIncomingBlock ..
+func (a *ProducerPlugin) OnIncomingBlock(block chain.SignedBlock, blockID *chain.BlockIDType) bool {
+	myChain := a.ChainPlugin.GetChain()
+	if a.PendingBlockMode == nodeenum.Porducing {
+		var idString string
+		idString = "UNKNOWN"
+		if blockID != nil {
+			idString = blockID.String()
+		}
+
+		log.AppLog().Infof("dropped incoming block %d id: %s", block.BlockNum(), idString)
+		return false
+	}
+
+	var id *chain.BlockIDType
+	if blockID != nil {
+		id = blockID
+	} else {
+		idtmp := block.ID()
+		id = &idtmp
+	}
+
+	blkNum := block.BlockNum()
+	log.AppLog().Debugf("received incoming block blkNum %d  id:%d", blkNum, id)
+	if block.Tmestamp.Time() >= uint64(time.Now().Unix()+int64(time.Second*7)) {
+		log.Assert("received a block from the future, ignoring it: id :%d", id)
+	}
+
+	existing := myChain.FetchBlockByID(*id)
+	if existing != nil {
+		return false
+	}
+
+	bsf := myChain.CreateBlockStateFuture(&block)
+	a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
+	ensure := func() {
+
+	}
+
+	return true
 }
 
 //MakeKeySignatureProvider ..
