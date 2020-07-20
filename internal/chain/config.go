@@ -28,3 +28,6 @@ var DefaultSubjectiveCPULeewayUs uint32 = 31000
 
 //DefaultControllerThreadPoolSize ..
 var DefaultControllerThreadPoolSize int16 = 2
+
+//ProducerRepetitions ..
+var ProducerRepetitions uint32 = 12

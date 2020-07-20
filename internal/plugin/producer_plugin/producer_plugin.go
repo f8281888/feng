@@ -9,7 +9,6 @@ import (
 	"feng/internal/chain"
 	"feng/internal/fc/common"
 	"feng/internal/fc/crypto"
-	"feng/internal/fc/stl"
 	"feng/internal/log"
 	chainplugin "feng/internal/plugin/chain_plugin"
 	"feng/internal/pool"
@@ -146,7 +145,7 @@ type Impl struct {
 	SignatureProviders                    map[crypto.PublicKey]SignatureProviderType
 	Producers                             []chain.AccountName
 	Timer                                 time.Time
-	ProducerWatermarks                    map[chain.AccountName]stl.Pair
+	ProducerWatermarks                    map[chain.AccountName]producerWatermark
 	PendingBlockMode                      uint32
 	UnappliedTransactions                 chain.UnappliedTransactionQueue
 	ThreadPool                            pool.WorkPool
@@ -374,40 +373,174 @@ const (
 	//Succeeded ..
 	Succeeded = iota
 	//Failed ..
-	Failed= iota
+	Failed = iota
 	//WaitingForBlock ..
-	WaitingForBlock= iota
+	WaitingForBlock = iota
 	//WaitingForProduction ..
-	WaitingForProduction= iota
+	WaitingForProduction = iota
 	//Exhausted ..
-	Exhausted= iota
+	Exhausted = iota
 )
 
-func   (a *ProducerPlugin) calculatePendingBlockTime() time.Duration {
-	myChain = a.ChainPlugin.GetChain()
-	now := time.Now().Unix()
-	base := common.Max(now, myChain.HeadBlockTime)
-	minTimeToNextBlock := 
-	// const int64_t min_time_to_next_block = (config::block_interval_us) - (base.time_since_epoch().count() % (config::block_interval_us) );
-	// fc::time_point block_time = base + fc::microseconds(min_time_to_next_block);
-	// return block_time;
- }
-
-func (a *ProducerPlugin) StartBlock() uint32{
+func (a *ProducerPlugin) calculatePendingBlockTime() time.Duration {
 	myChain := a.ChainPlugin.GetChain()
-	if !a.ChainPlugin.AcceptTransactions(){
+	now := time.Now().Unix()
+	base := common.MaxUint64(uint64(now), myChain.HeadBlockTime())
+	minTimeToNextBlock := uint64(chain.BlockIntervalUs) - base%uint64(chain.BlockIntervalUs)
+	blockTime := time.Duration(base) + time.Microsecond*time.Duration(minTimeToNextBlock)
+	return blockTime
+}
+
+const (
+	//Producing ..
+	Producing = iota
+	//Speculating ..
+	Speculating = iota
+)
+
+//StartBlock ..
+func (a *ProducerPlugin) StartBlock() uint32 {
+	myChain := a.ChainPlugin.GetChain()
+	if !a.ChainPlugin.AcceptTransactions {
 		return WaitingForBlock
 	}
 
 	hbs := myChain.HeadBlockState()
 	now := time.Now()
-	blockTime := 
+	blockTime := a.calculatePendingBlockTime()
+	previousPendingMode := a.PendingBlockMode
+	a.PendingBlockMode = Producing
+	b := chain.BlockTimestamp{Slot: uint32(blockTime)}
+	scheduledProducer := hbs.GetScheduledProducer(b)
+	currentWatermark := a.getWatermark(scheduledProducer.ProducerName)
+	numRelevantSignatures := 0
+	// scheduled_producer.for_each_key([&](const public_key_type& key){
+	// 	const auto& iter = _signature_providers.find(key);
+	// 	if(iter != _signature_providers.end()) {
+	// 	   num_relevant_signatures++;
+	// 	}
+	//  });
+
+	var findFlag bool = false
+	for _, i := range a.Producers {
+		if i == scheduledProducer.ProducerName {
+			findFlag = true
+			break
+		}
+	}
+
+	irreversibleBlockAge := a.getIrreversibleBlockAge()
+	if !a.ProductionEnabled {
+		a.PendingBlockMode = Speculating
+	} else if !findFlag {
+		a.PendingBlockMode = Speculating
+	} else if numRelevantSignatures == 0 {
+		log.AppLog().Errorf("Not producing block because I don't have any private keys relevant to authority: %s", scheduledProducer.Authority)
+		a.PendingBlockMode = Speculating
+	} else if a.PauseProduction {
+		log.AppLog().Errorf("Not producing block because production is explicitly paused")
+		a.PendingBlockMode = Speculating
+	} else if a.MaxIrreversibleBlockAgeUs >= 0 && irreversibleBlockAge >= a.MaxIrreversibleBlockAgeUs {
+		log.AppLog().Errorf("Not producing block because the irreversible block is too old [age:%ds, max:%ds]", irreversibleBlockAge/10000000, a.MaxIrreversibleBlockAgeUs/10000000)
+		a.PendingBlockMode = Speculating
+	}
+
+	if a.PendingBlockMode == Producing {
+		blockTimestamp := chain.BlockTimestamp{Slot: uint32(blockTime)}
+		if currentWatermark.First > hbs.BlockNum {
+			log.AppLog().Errorf("Not producing block because %s signed a block at a higher block number %d than the current fork's head %d", scheduledProducer.ProducerName, currentWatermark.First, hbs.BlockNum)
+			a.PendingBlockMode = Speculating
+		} else if currentWatermark.Second.IsGreater(blockTimestamp) {
+			log.AppLog().Errorf("Not producing block because %s signed a block at the next block time or later %d than the pending block time %d", scheduledProducer.ProducerName, currentWatermark.First, hbs.BlockNum)
+		}
+	}
+
+	if a.PendingBlockMode == Speculating {
+		headBlockAge := now.Unix() - int64(myChain.HeadBlockTime())
+		if headBlockAge > int64(time.Second*5) {
+			return WaitingForBlock
+		}
+	}
+
+	if a.PendingBlockMode == Producing {
+		startBlockTime := blockTime - time.Microsecond*time.Duration(chain.BlockIntervalUs)
+		if now.Unix() < int64(startBlockTime) {
+			log.AppLog().Debugf("Not producing block waiting for production window %d %d", hbs.BlockNum+1, blockTime)
+			a.scheduleDelayedProductionLoop(a, a.ca)
+		}
+	}
+
+	return 0
+}
+
+func (a ProducerPlugin) calculateProducerWakeUpTime(refBlockTime chain.BlockTimestamp) {
+	var wakeUpTime time.Time
+	for p := range a.Producers {
+		//nextProducerBlockTime : = a.ca
+	}
+}
+
+func (a ProducerPlugin) calculateNextBlockTime(produceName chain.AccountName, currentBlockTime chain.BlockTimestamp) time.Time{
+	myChain := a.ChainPlugin.GetChain()
+	hbs := myChain.HeadBlockState()
+	activeSchedule := hbs.ActiveSchedule.Producers
+	var findFlag bool = false
+	var producerIndex uint32
+	for k,b := range in activeSchedule{
+		if b.ProducerName == produceName{
+			findFlag = true
+			producerIndex = k
+			break
+		}
+	}
+
+	if !findFlag{
+		return time.Time{}
+	}
+}
+
+func (a ProducerPlugin) scheduleDelayedProductionLoop(weakThis *ProducerPlugin, wakeUpTime time.Duration) {
+	if wakeUpTime > 0 {
+		log.AppLog().Debugf("Scheduling Speculative/Production Change at %d", wakeUpTime)
+		timer := time.NewTimer(wakeUpTime)
+		<-timer.C
+		go func() {
+			a.TimerCorelationID++
+			if a.TimerCorelationID == weakThis.TimerCorelationID {
+				weakThis.ScheduleProductionLoop()
+			}
+		}()
+	}
+
+}
+
+func (a ProducerPlugin) getIrreversibleBlockAge() time.Duration {
+	now := time.Now()
+	if now.Unix() < int64(a.IrreversibleBlockTime) {
+		return time.Microsecond * 0
+	}
+
+	return time.Duration(now.Unix()-int64(a.IrreversibleBlockTime)) * time.Microsecond
+}
+
+type producerWatermark struct {
+	First  uint32
+	Second chain.BlockTimestamp
+}
+
+func (a ProducerPlugin) getWatermark(producer chain.AccountName) producerWatermark {
+	itr, ok := a.ProducerWatermarks[producer]
+	if !ok {
+		return producerWatermark{}
+	}
+
+	return itr
 }
 
 //ScheduleProductionLoop ..
 func (a *ProducerPlugin) ScheduleProductionLoop() {
 	a.Timer.Clock()
-	result := 
+	//result :=
 }
 
 //OnIncomingBlock ..

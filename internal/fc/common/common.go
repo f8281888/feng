@@ -27,6 +27,20 @@ func Max(a, b int) int {
 	return val
 }
 
+//MinUint64 小
+func MinUint64(a, b uint64) uint64 {
+	i := ternary(a <= b, a, b)
+	val, _ := i.(uint64)
+	return val
+}
+
+//MaxUint64 大
+func MaxUint64(a, b uint64) uint64 {
+	i := ternary(a >= b, a, b)
+	val, _ := i.(uint64)
+	return val
+}
+
 //BytesToInt ..
 func BytesToInt(b []byte) int {
 	bytesBuffer := bytes.NewBuffer(b)
