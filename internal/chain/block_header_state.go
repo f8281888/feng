@@ -29,7 +29,7 @@ type BlockHeaderState struct {
 
 //GetScheduledProducer ..
 func (b BlockHeaderState) GetScheduledProducer(t BlockTimestamp) ProduceAuthority {
-	index := int(t.Slot) % len(b.ActiveSchedule.producers) * int(ProducerRepetitions)
+	index := int(t.Slot) % len(b.ActiveSchedule.Producers) * int(ProducerRepetitions)
 	index /= int(ProducerRepetitions)
-	return b.ActiveSchedule.producers[index]
+	return b.ActiveSchedule.Producers[index]
 }

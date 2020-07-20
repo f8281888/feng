@@ -409,6 +409,7 @@ func (a *ProducerPlugin) StartBlock() uint32 {
 	now := time.Now()
 	blockTime := a.calculatePendingBlockTime()
 	previousPendingMode := a.PendingBlockMode
+	println(previousPendingMode)
 	a.PendingBlockMode = Producing
 	b := chain.BlockTimestamp{Slot: uint32(blockTime)}
 	scheduledProducer := hbs.GetScheduledProducer(b)
@@ -466,7 +467,7 @@ func (a *ProducerPlugin) StartBlock() uint32 {
 		startBlockTime := blockTime - time.Microsecond*time.Duration(chain.BlockIntervalUs)
 		if now.Unix() < int64(startBlockTime) {
 			log.AppLog().Debugf("Not producing block waiting for production window %d %d", hbs.BlockNum+1, blockTime)
-			a.scheduleDelayedProductionLoop(a, a.ca)
+			//a.scheduleDelayedProductionLoop(a, a.ca)
 		}
 	}
 
@@ -474,29 +475,32 @@ func (a *ProducerPlugin) StartBlock() uint32 {
 }
 
 func (a ProducerPlugin) calculateProducerWakeUpTime(refBlockTime chain.BlockTimestamp) {
-	var wakeUpTime time.Time
-	for p := range a.Producers {
-		//nextProducerBlockTime : = a.ca
-	}
+	// var wakeUpTime time.Time
+	// for p := range a.Producers {
+	// 	//nextProducerBlockTime : = a.ca
+	// }
 }
 
-func (a ProducerPlugin) calculateNextBlockTime(produceName chain.AccountName, currentBlockTime chain.BlockTimestamp) time.Time{
+func (a ProducerPlugin) calculateNextBlockTime(produceName chain.AccountName, currentBlockTime chain.BlockTimestamp) time.Time {
 	myChain := a.ChainPlugin.GetChain()
 	hbs := myChain.HeadBlockState()
 	activeSchedule := hbs.ActiveSchedule.Producers
 	var findFlag bool = false
 	var producerIndex uint32
-	for k,b := range in activeSchedule{
-		if b.ProducerName == produceName{
+	for k, b := range activeSchedule {
+		if b.ProducerName == produceName {
 			findFlag = true
-			producerIndex = k
+			producerIndex = uint32(k)
 			break
 		}
 	}
 
-	if !findFlag{
+	if !findFlag {
 		return time.Time{}
 	}
+
+	println(producerIndex)
+	return time.Time{}
 }
 
 func (a ProducerPlugin) scheduleDelayedProductionLoop(weakThis *ProducerPlugin, wakeUpTime time.Duration) {
@@ -576,11 +580,11 @@ func (a *ProducerPlugin) OnIncomingBlock(block chain.SignedBlock, blockID *chain
 		return false
 	}
 
-	bsf := myChain.CreateBlockStateFuture(&block)
-	a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
-	ensure := func() {
+	// bsf := myChain.CreateBlockStateFuture(&block)
+	// a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
+	// ensure := func() {
 
-	}
+	// }
 
 	return true
 }

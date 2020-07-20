@@ -12,3 +12,4 @@
 2020-07-17T16:29:42.033+0800	ERROR	log/logger.go:45	ForkDB is null
 2020-07-17T16:40:04.610+0800	ERROR	log/logger.go:45	startSighupHandler
 2020-07-17T16:45:02.807+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-20T10:40:27.624+0800	ERROR	log/logger.go:45	startSighupHandler
