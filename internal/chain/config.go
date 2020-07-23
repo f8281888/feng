@@ -31,3 +31,5 @@ var DefaultControllerThreadPoolSize int16 = 2
 
 //ProducerRepetitions ..
 var ProducerRepetitions uint32 = 12
+
+var systemAccountName string = "fengio"

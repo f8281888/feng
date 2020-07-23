@@ -571,7 +571,7 @@ func (a *ProducerPlugin) OnIncomingBlock(block chain.SignedBlock, blockID *chain
 
 	blkNum := block.BlockNum()
 	log.AppLog().Debugf("received incoming block blkNum %d  id:%d", blkNum, id)
-	if block.Tmestamp.Time() >= uint64(time.Now().Unix()+int64(time.Second*7)) {
+	if block.Timestamp.Time() >= uint64(time.Now().Unix()+int64(time.Second*7)) {
 		log.Assert("received a block from the future, ignoring it: id :%d", id)
 	}
 
@@ -580,11 +580,14 @@ func (a *ProducerPlugin) OnIncomingBlock(block chain.SignedBlock, blockID *chain
 		return false
 	}
 
-	// bsf := myChain.CreateBlockStateFuture(&block)
-	// a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
-	// ensure := func() {
+	//bsf := myChain.CreateBlockStateFuture(&block)
+	a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
+	ensure := func() {
+		a.ScheduleProductionLoop()
+	}
 
-	// }
+	ensure()
+	//myChain.
 
 	return true
 }

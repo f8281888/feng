@@ -36,3 +36,17 @@ type SignedBlock struct {
 func (s SignedBlock) BlockNum() uint32 {
 	return 0
 }
+
+//Copy ..
+func (s *SignedBlock) Copy(copy SignedBlockHeader) {
+	s.producerSignature = copy.producerSignature
+	s.Timestamp = copy.Timestamp
+	s.producer = copy.producer
+	s.confirmed = copy.confirmed
+	s.previous = copy.previous
+	s.transactionMroot = copy.transactionMroot
+	s.actionMroot = copy.actionMroot
+	s.scheduleVersion = copy.scheduleVersion
+	s.newProducers = copy.newProducers
+	s.extensionsType = copy.extensionsType
+}

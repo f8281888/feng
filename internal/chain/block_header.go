@@ -9,7 +9,7 @@ import (
 //BlockHeader 头
 type BlockHeader struct {
 	//时间戳 生成区块的时间
-	Tmestamp BlockTimestamp
+	Timestamp BlockTimestamp
 	//生产区块的节点
 	producer Name
 	//区块的确认数

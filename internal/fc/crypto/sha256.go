@@ -7,6 +7,7 @@ import (
 //Sha256 Sha256
 type Sha256 struct {
 	Hash []byte
+	Data interface{}
 }
 
 //New ..

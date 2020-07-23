@@ -20,14 +20,19 @@ type BlockSigningAuthorityV0 struct {
 	keys      []KeyWeight
 }
 
-//ProduceAuthority ..
-type ProduceAuthority struct {
+//ProducerAuthority ..
+type ProducerAuthority struct {
 	ProducerName Name
 	Authority    BlockSigningAuthorityV0
 }
 
-//ProduceAuthoritySchedule ..
-type ProduceAuthoritySchedule struct {
+//ProducerAuthoritySchedule ..
+type ProducerAuthoritySchedule struct {
 	version   uint32
-	Producers []ProduceAuthority
+	Producers []ProducerAuthority
+}
+
+//ProducerScheduleChangeExtension ..
+type ProducerScheduleChangeExtension struct {
+	ProducerAuthoritySchedule
 }

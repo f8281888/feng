@@ -13,3 +13,6 @@
 2020-07-17T16:40:04.610+0800	ERROR	log/logger.go:45	startSighupHandler
 2020-07-17T16:45:02.807+0800	ERROR	log/logger.go:45	startSighupHandler
 2020-07-20T10:40:27.624+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-23T16:39:35.995+0800	ERROR	chain/name.go:23	string is error :fengio
+2020-07-23T16:40:22.111+0800	ERROR	chain/name.go:23	string is error :fengio
+2020-07-23T17:41:40.022+0800	ERROR	log/logger.go:45	startSighupHandler

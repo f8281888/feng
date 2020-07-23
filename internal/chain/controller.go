@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+const (
+	//Full ..
+	Full = iota
+	//Light ..
+	Light = iota
+)
+
 //ControllerConfig ..
 type ControllerConfig struct {
 	senderBypassWhiteblacklist      []Name
@@ -23,7 +30,7 @@ type ControllerConfig struct {
 	stateSize                       uint64
 	stateGuardSize                  uint64
 	reversibleCacheSize             uint64
-	reversibleGuardSize             uint64
+	ReversibleGuardSize             uint64
 	sigCPUBillPct                   uint32
 	threadPoolSize                  uint16
 	readonly                        bool
@@ -44,6 +51,8 @@ type ControllerConfig struct {
 	subjectiveCPULeeway            uint64
 	trustedProducerLightValidation bool
 	snapshotHeadBlock              uint32
+	blockValidationMode            uint32
+	trustedProducers               []AccountName
 	//named_thread_pool              thread_pool;
 	//platform_timer                 timer;
 	// typedef pair<scope_name,action_name>                   handler_key;
@@ -111,7 +120,7 @@ type ControllerImpl struct {
 	ForkDB                         *ForkDatabase
 	conf                           ControllerConfig
 	inTrxRequiringChecks           bool
-	trustedProducerLightValidation bool
+	TrustedProducerLightValidation bool
 	snapshotHeadBlock              uint32
 	ChainID                        CIDType
 	readMode                       uint16
@@ -119,6 +128,8 @@ type ControllerImpl struct {
 	Blog                           BlockLog
 	pending                        *PendingState
 	protocolFeatures               ProtocolFeatureManager
+	preAcceptedBlock               chan *SignedBlock
+	acceptedBlockHeader            chan *BlockState
 }
 
 //Controller ..
@@ -207,10 +218,37 @@ func (c *Controller) Init(func() bool) {
 //InitializeBlockchainState ..
 func (c *Controller) InitializeBlockchainState(genesis GenesisState) {
 	log.AppLog().Infof("Initializing new blockchain with genesis state")
-	// producer_authority_schedule initial_schedule = { 0, { producer_authority{config::system_account_name, block_signing_authority_v0{ 1, {{genesis.initial_key, 1}} } } } };
-	// legacy::producer_schedule_type initial_legacy_schedule{ 0, {{config::system_account_name, genesis.initial_key}} };
+	var producers []ProducerAuthority
+	producer := Name{}
+	producer.Name(systemAccountName)
+	log.AppLog().Debugf("producer :%s", producer.ToString())
+	producers = append(producers, ProducerAuthority{ProducerName: producer})
+	initialSchedule := ProducerAuthoritySchedule{version: 0, Producers: producers}
+	producerkey := ProducerKey{producerName: producer, blockSigningKey: genesis.initialKey}
+	var producerKeys []ProducerKey
+	producerKeys = append(producerKeys, producerkey)
+	initialLegacySchedule := ProducerScheduleType{version: 0, producers: producerKeys}
 	genheader := BlockHeaderState{}
-	genheader.id = genheader.header.ID()
+	genheader.ActiveSchedule = initialSchedule
+	genheader.pendingSchedule.schedule = initialSchedule
+	genheader.pendingSchedule.scheduleHash = crypto.Sha256{Data: initialLegacySchedule}
+	genheader.header.Timestamp = BlockTimestamp{Slot: uint32(genesis.initialTimestamp)}
+	genheader.header.actionMroot = *genesis.ComputeChainID().GetSha256()
+	genheader.id = &crypto.Sha256{}
+	*genheader.id = genheader.header.ID()
+	genheader.BlockNum = genheader.header.BlockNum()
+	c.head = &BlockState{}
+	c.head.Copy(genheader)
+	c.head.activatedProtocolFeatures = ProtocolFeatureActivationSet{}
+	c.head.block = &SignedBlock{}
+	c.head.block.Copy(genheader.header)
+	c.DB.SetRversion(uint64(c.head.BlockNum))
+	c.initializeDatabase(&genesis)
+}
+
+//TODO
+func (c Controller) initializeDatabase(genesis *GenesisState) {
+
 }
 
 //StartUpSingle ..
@@ -274,5 +312,131 @@ func (c Controller) HeadBlockState() *BlockState {
 
 //HeadBlockTime ..
 func (c Controller) HeadBlockTime() uint64 {
-	return c.head.header.Tmestamp.Time()
+	return c.head.header.Timestamp.Time()
+}
+
+//ForkedBranchCallback ..
+type ForkedBranchCallback func(*BranchType)
+
+//TrxMetaCacheLookup ..
+type TrxMetaCacheLookup = func(*TransactionIDType) TransactionMetadata
+
+//GetDB ..
+func (c Controller) GetDB() chainbase.DataBase {
+	return c.DB
+}
+
+func (c *Controller) validateDBAvailableSize() {
+	//get_free_memory() 获取段内存，用来？
+	//const auto free = my->reversible_blocks.get_segment_manager()->get_free_memory();
+	free := c.GetDB().GetSegmentManager().Len()
+	guard := c.ControllerImpl.conf.ReversibleGuardSize
+	if uint64(free) < guard {
+		log.Assert("database free: %d, guard size: %d", free, guard)
+	}
+}
+
+func (c *Controller) validateReversibleAvailableSize() {
+	free := c.reversibleBlocks.GetSegmentManager().Len()
+	guard := c.conf.ReversibleGuardSize
+	if uint64(free) < guard {
+		log.Assert("reversible_guard_exception free: %d, guard size: %d", free, guard)
+	}
+}
+
+//PushBlock ..
+func (c *Controller) PushBlock(blockState *BlockState, forkedBranchCb *ForkedBranchCallback, trxLookup *TrxMetaCacheLookup) {
+	c.validateDBAvailableSize()
+	c.validateReversibleAvailableSize()
+	c.pushBlock(blockState, forkedBranchCb, trxLookup)
+}
+
+const (
+	//Irreversible ..
+	Irreversible = iota
+	//Validated ..
+	Validated = iota
+	//Complete ..
+	Complete = iota
+	//Incomplete ..
+	Incomplete = iota
+)
+
+//PushBlock ..
+func (c *Controller) pushBlock(blockState *BlockState, forkedBranchCb *ForkedBranchCallback, trxLookup *TrxMetaCacheLookup) {
+	var s uint32 = Complete
+	if c.pending == nil {
+		log.Assert("it is not valid to push a block when there is a pending block")
+	}
+
+	//oldValue := c.TrustedProducerLightValidation
+	// resetProdLightValidation := common.MakeScopeExit(func() {
+	// 	c.TrustedProducerLightValidation = oldValue
+	// })
+
+	bsp := blockState
+	b := bsp.block
+	c.emitSingedBlock(b)
+	c.ForkDB.Add(bsp, false)
+
+	if c.isTrustedProducer(b.producer) {
+		c.trustedProducerLightValidation = true
+	}
+
+	c.emitBlockState(bsp)
+
+	if c.readMode != Irreversible {
+		c.maybeSwitchForks(c.ForkDB.pendingHead(), s, *forkedBranchCb, *trxLookup)
+	}
+
+}
+
+//TOD
+func (c *Controller) maybeSwitchForks(newHead *BlockState, s uint32, forkedBranchCb ForkedBranchCallback, trxLoopup TrxMetaCacheLookup) {
+	//headChanged := true
+	if &newHead.header.previous == c.head.id {
+		c.applyBlock(newHead, s, trxLoopup)
+	}
+}
+
+//TODO
+func (c *Controller) applyBlock(bsp *BlockState, s uint32, trxLoop TrxMetaCacheLookup) {
+	b := bsp.block
+	newProtocolFeatureActivations := bsp.GetNewProtocolFeatureActivations()
+	producerBlockID := b.ID()
+	c.startBlock(b.Timestamp, b.confirmed, newProtocolFeatureActivations, s, producerBlockID)
+}
+
+//TODO
+func (c *Controller) startBlock(when BlockTimestamp, confirmBlockCount uint16, newProtocolFeatureActivations []DigestType, s uint32, producerBlockID BlockIDType) {
+	if c.pending == nil {
+		log.Assert("pending block already exists")
+	}
+}
+
+//监听发出信号，有信号过来就触发
+func (c *Controller) emitSingedBlock(k *SignedBlock) {
+	c.preAcceptedBlock = make(chan *SignedBlock)
+	c.preAcceptedBlock <- k
+}
+
+func (c *Controller) emitBlockState(k *BlockState) {
+	c.acceptedBlockHeader = make(chan *BlockState)
+	c.acceptedBlockHeader <- k
+}
+
+func (c Controller) isTrustedProducer(producer AccountName) bool {
+	var ok bool = false
+	for _, i := range c.conf.trustedProducers {
+		if producer == i {
+			ok = true
+			break
+		}
+	}
+
+	return c.getValidationMode() == Light || ok
+}
+
+func (c Controller) getValidationMode() uint32 {
+	return c.conf.blockValidationMode
 }

@@ -2,6 +2,8 @@ package chainbase
 
 import (
 	"reflect"
+
+	"golang.org/x/exp/mmap"
 )
 
 const (
@@ -196,6 +198,7 @@ type DataBase struct {
 	Session
 	sizeOfValueType uint32
 	sizeOfThis      uint32
+	dbFile          *PinnableMappedFile
 }
 
 //GetRversion ..
@@ -212,3 +215,14 @@ func (c *DataBase) SetRversion(u uint64) {
 func (c DataBase) Undo() {
 	println("DataBase Undo")
 }
+
+//GetSegmentManager ..
+func (c DataBase) GetSegmentManager() *mmap.ReaderAt {
+	return c.dbFile.GetSegmentManager()
+}
+
+//使用auto + decltype，实现 返回类型后置/追踪返回类型
+//编译器从左向右读取
+// auto get_segment_manager() -> decltype( ((pinnable_mapped_file*)nullptr)->get_segment_manager()) {
+// 	return _db_file.get_segment_manager();
+//  }
