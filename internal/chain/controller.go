@@ -67,12 +67,22 @@ type MaybeSession struct {
 
 //BuildingBlock ..
 type BuildingBlock struct {
-	PendingTrxMetas []*TransactionMetadata
+	PendingTrxMetas                         []*TransactionMetadata
+	PendingBlockHeaderState                 PendingBlockHeaderState
+	NewPendingProducerSchedule              ProducerAuthoritySchedule
+	NewProtocolFeatureActivations           []DigestType
+	NumNewProtocolFeaturesThatHaveActivated uint32
+	PendingTrxReceipts                      []TransactionReceipt
+	Actions                                 []ActionReceipt
+	TransactionMroot                        Checksum256Type
 }
 
 //AssembledBlock ..
 type AssembledBlock struct {
-	TrxMetas []*TransactionMetadata
+	ID                      BlockIDType
+	TrxMetas                []*TransactionMetadata
+	PendingBlockHeaderState PendingBlockHeaderState
+	UnsignedBlock           *SignedBlock
 }
 
 //CompledBlock ..
@@ -93,6 +103,15 @@ type BlockStageType struct {
 type PendingState struct {
 	dbSession  MaybeSession
 	blockState BlockStageType
+}
+
+//GetPendingBlockHeaderState ..
+func (p PendingState) GetPendingBlockHeaderState() PendingBlockHeaderState {
+	if p.blockState.buildingBlock != nil {
+		return p.blockState.buildingBlock.PendingBlockHeaderState
+	}
+
+	return p.blockState.assembledBlock.PendingBlockHeaderState
 }
 
 //ExtractTrxMetas ..
@@ -130,6 +149,7 @@ type ControllerImpl struct {
 	protocolFeatures               ProtocolFeatureManager
 	preAcceptedBlock               chan *SignedBlock
 	acceptedBlockHeader            chan *BlockState
+	resourceLimits                 ResourceLimitsManager
 }
 
 //Controller ..
@@ -232,16 +252,16 @@ func (c *Controller) InitializeBlockchainState(genesis GenesisState) {
 	genheader.ActiveSchedule = initialSchedule
 	genheader.pendingSchedule.schedule = initialSchedule
 	genheader.pendingSchedule.scheduleHash = crypto.Sha256{Data: initialLegacySchedule}
-	genheader.header.Timestamp = BlockTimestamp{Slot: uint32(genesis.initialTimestamp)}
-	genheader.header.actionMroot = *genesis.ComputeChainID().GetSha256()
-	genheader.id = &crypto.Sha256{}
-	*genheader.id = genheader.header.ID()
-	genheader.BlockNum = genheader.header.BlockNum()
+	genheader.Header.Timestamp = BlockTimestamp{Slot: uint32(genesis.initialTimestamp)}
+	genheader.Header.actionMroot = *genesis.ComputeChainID().GetSha256()
+	genheader.ID = &crypto.Sha256{}
+	*genheader.ID = genheader.Header.ID()
+	genheader.BlockNum = genheader.Header.BlockNum()
 	c.head = &BlockState{}
 	c.head.Copy(genheader)
 	c.head.activatedProtocolFeatures = ProtocolFeatureActivationSet{}
-	c.head.block = &SignedBlock{}
-	c.head.block.Copy(genheader.header)
+	c.head.Block = &SignedBlock{}
+	c.head.Block.Copy(genheader.Header)
 	c.DB.SetRversion(uint64(c.head.BlockNum))
 	c.initializeDatabase(&genesis)
 }
@@ -269,8 +289,8 @@ func (c *Controller) SetSubjectiveCPULeeway(t time.Duration) {
 //FetchBlockByID ..
 func (c *Controller) FetchBlockByID(id BlockIDType) *SignedBlock {
 	state := c.ForkDB.GetBlock(id)
-	if state != nil && state.block != nil {
-		return state.block
+	if state != nil && state.Block != nil {
+		return state.Block
 	}
 
 	return nil
@@ -312,7 +332,7 @@ func (c Controller) HeadBlockState() *BlockState {
 
 //HeadBlockTime ..
 func (c Controller) HeadBlockTime() uint64 {
-	return c.head.header.Timestamp.Time()
+	return c.head.Header.Timestamp.Time()
 }
 
 //ForkedBranchCallback ..
@@ -345,7 +365,7 @@ func (c *Controller) validateReversibleAvailableSize() {
 }
 
 //PushBlock ..
-func (c *Controller) PushBlock(blockState *BlockState, forkedBranchCb *ForkedBranchCallback, trxLookup *TrxMetaCacheLookup) {
+func (c *Controller) PushBlock(blockState *BlockState, forkedBranchCb ForkedBranchCallback, trxLookup TrxMetaCacheLookup) {
 	c.validateDBAvailableSize()
 	c.validateReversibleAvailableSize()
 	c.pushBlock(blockState, forkedBranchCb, trxLookup)
@@ -363,7 +383,7 @@ const (
 )
 
 //PushBlock ..
-func (c *Controller) pushBlock(blockState *BlockState, forkedBranchCb *ForkedBranchCallback, trxLookup *TrxMetaCacheLookup) {
+func (c *Controller) pushBlock(blockState *BlockState, forkedBranchCb ForkedBranchCallback, trxLookup TrxMetaCacheLookup) {
 	var s uint32 = Complete
 	if c.pending == nil {
 		log.Assert("it is not valid to push a block when there is a pending block")
@@ -375,18 +395,18 @@ func (c *Controller) pushBlock(blockState *BlockState, forkedBranchCb *ForkedBra
 	// })
 
 	bsp := blockState
-	b := bsp.block
+	b := bsp.Block
 	c.emitSingedBlock(b)
 	c.ForkDB.Add(bsp, false)
 
-	if c.isTrustedProducer(b.producer) {
+	if c.isTrustedProducer(b.Producer) {
 		c.trustedProducerLightValidation = true
 	}
 
 	c.emitBlockState(bsp)
 
 	if c.readMode != Irreversible {
-		c.maybeSwitchForks(c.ForkDB.pendingHead(), s, *forkedBranchCb, *trxLookup)
+		c.maybeSwitchForks(c.ForkDB.pendingHead(), s, forkedBranchCb, trxLookup)
 	}
 
 }
@@ -394,17 +414,17 @@ func (c *Controller) pushBlock(blockState *BlockState, forkedBranchCb *ForkedBra
 //TOD
 func (c *Controller) maybeSwitchForks(newHead *BlockState, s uint32, forkedBranchCb ForkedBranchCallback, trxLoopup TrxMetaCacheLookup) {
 	//headChanged := true
-	if &newHead.header.previous == c.head.id {
+	if &newHead.Header.previous == c.head.ID {
 		c.applyBlock(newHead, s, trxLoopup)
 	}
 }
 
 //TODO
 func (c *Controller) applyBlock(bsp *BlockState, s uint32, trxLoop TrxMetaCacheLookup) {
-	b := bsp.block
+	b := bsp.Block
 	newProtocolFeatureActivations := bsp.GetNewProtocolFeatureActivations()
 	producerBlockID := b.ID()
-	c.startBlock(b.Timestamp, b.confirmed, newProtocolFeatureActivations, s, producerBlockID)
+	c.startBlock(b.Timestamp, b.Confirmed, newProtocolFeatureActivations, s, producerBlockID)
 }
 
 //TODO
@@ -439,4 +459,37 @@ func (c Controller) isTrustedProducer(producer AccountName) bool {
 
 func (c Controller) getValidationMode() uint32 {
 	return c.conf.blockValidationMode
+}
+
+//LastIrreversibleBlockNum ..
+func (c Controller) LastIrreversibleBlockNum() uint32 {
+	return c.ForkDB.root.BlockNum
+}
+
+//IsBuildingBlock ..
+func (c Controller) IsBuildingBlock() bool {
+	return c.pending != nil
+}
+
+//PendingBlockTime ..
+func (c Controller) PendingBlockTime() time.Duration {
+	if c.pending == nil {
+		log.Assert("no pending block")
+	}
+
+	if c.pending.blockState.compledBlock != nil {
+		return time.Duration(c.pending.blockState.compledBlock.blockState.Header.Timestamp.Slot)
+	}
+
+	return time.Duration(c.pending.GetPendingBlockHeaderState().Timestamp.Slot)
+}
+
+//HeadBlockNum ..
+func (c Controller) HeadBlockNum() uint32 {
+	return c.head.BlockNum
+}
+
+//GetResourceLimitsManager ..
+func (c Controller) GetResourceLimitsManager() ResourceLimitsManager {
+	return c.resourceLimits
 }

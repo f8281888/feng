@@ -144,7 +144,7 @@ type Impl struct {
 	PauseProduction                       bool
 	SignatureProviders                    map[crypto.PublicKey]SignatureProviderType
 	Producers                             []chain.AccountName
-	Timer                                 time.Time
+	Timer                                 time.Timer
 	ProducerWatermarks                    map[chain.AccountName]producerWatermark
 	PendingBlockMode                      uint32
 	UnappliedTransactions                 chain.UnappliedTransactionQueue
@@ -474,11 +474,27 @@ func (a *ProducerPlugin) StartBlock() uint32 {
 	return 0
 }
 
-func (a ProducerPlugin) calculateProducerWakeUpTime(refBlockTime chain.BlockTimestamp) {
-	// var wakeUpTime time.Time
-	// for p := range a.Producers {
-	// 	//nextProducerBlockTime : = a.ca
-	// }
+func (a ProducerPlugin) calculateProducerWakeUpTime(refBlockTime chain.BlockTimestamp) time.Duration {
+	var wakeUpTime time.Duration
+	for _, p := range a.Producers {
+		nextProducerBlockTime := a.calculateNextBlockTime(p, refBlockTime)
+		if nextProducerBlockTime.Unix() > 0 {
+			producerWakeUpTime := time.Duration(nextProducerBlockTime.Unix()) - time.Duration(chain.BlockIntervalUs)*time.Microsecond
+			if wakeUpTime.Seconds() > 0 {
+				if producerWakeUpTime < wakeUpTime {
+					wakeUpTime = producerWakeUpTime
+				}
+			} else {
+				wakeUpTime = producerWakeUpTime
+			}
+		}
+	}
+
+	if wakeUpTime.Seconds() <= 0 {
+		log.AppLog().Debugf("Not Scheduling Speculative/Production, no local producers had valid wake up times")
+	}
+
+	return wakeUpTime
 }
 
 func (a ProducerPlugin) calculateNextBlockTime(produceName chain.AccountName, currentBlockTime chain.BlockTimestamp) time.Time {
@@ -543,8 +559,80 @@ func (a ProducerPlugin) getWatermark(producer chain.AccountName) producerWaterma
 
 //ScheduleProductionLoop ..
 func (a *ProducerPlugin) ScheduleProductionLoop() {
-	a.Timer.Clock()
-	//result :=
+	a.Timer.Stop()
+	result := a.StartBlock()
+	if result == Failed {
+		log.AppLog().Errorf("Failed to start a pending block, will try again later")
+		a.Timer.Reset(time.Duration(chain.BlockIntervalUs / 10 * int(time.Microsecond)))
+		<-a.Timer.C
+		go func() {
+			if a != nil {
+				a.ScheduleProductionLoop()
+			}
+		}()
+	} else if result == WaitingForBlock {
+		if len(a.Producers) > 0 && !a.productionDisabledByPolicy() {
+			log.AppLog().Debugf("Waiting till another block is received and scheduling Speculative/Production Change")
+			b := chain.BlockTimestamp{Slot: uint32(a.calculatePendingBlockTime())}
+			a.scheduleDelayedProductionLoop(a, a.calculateProducerWakeUpTime(b))
+		} else {
+			log.AppLog().Debugf("Waiting till another block is received")
+		}
+	} else if result == WaitingForProduction {
+		// scheduled in start_block()
+	} else if a.PendingBlockMode == Producing {
+		a.scheduleMaybeProduceBlock(result == Exhausted)
+	} else if a.PendingBlockMode == Speculating && len(a.Producers) > 0 && !a.productionDisabledByPolicy() {
+		myChain := a.ChainPlugin.GetChain()
+		log.AppLog().Debugf("Speculative Block Created; Scheduling Speculative/Production Change")
+		if !myChain.IsBuildingBlock() {
+			log.Assert("speculating without pending_block_state")
+			b := chain.BlockTimestamp{Slot: uint32(myChain.PendingBlockTime())}
+			a.scheduleDelayedProductionLoop(a, a.calculateProducerWakeUpTime(b))
+		}
+	} else {
+		log.AppLog().Debugf("Speculative Block Created")
+	}
+}
+
+//TODO
+func (a ProducerPlugin) scheduleMaybeProduceBlock(exhausted bool) {
+	myChain := a.ChainPlugin.GetChain()
+	deadline := a.calculateBlockDeadline(myChain.PendingBlockTime())
+	if !exhausted && int(deadline.Seconds()) > time.Now().Second() {
+		if !myChain.IsBuildingBlock() {
+			log.Assert("producing without pending_block_state, start_block succeeded")
+		}
+
+		a.Timer.Reset(deadline)
+		var dec string = "Deadline exceeded"
+		if a.blockIsexhausted() {
+			dec = "Exhausted"
+		}
+
+		log.AppLog().Debugf("Scheduling Block Production on Normal Block #${%d} for ${%s}", myChain.HeadBlockNum()+1, dec)
+	}
+}
+
+//TODO
+func (a ProducerPlugin) blockIsexhausted() bool {
+	// myChain := a.ChainPlugin.GetChain()
+	// rl := myChain.GetResourceLimitsManager()
+	// cpuLimit :=	rl.
+	return false
+}
+
+func (a ProducerPlugin) calculateBlockDeadline(blockTime time.Duration) time.Duration {
+	lastBlock := uint32(blockTime.Seconds())%chain.ProducerRepetitions == chain.ProducerRepetitions-1
+	if lastBlock {
+		return blockTime + time.Duration(a.LastBlockTimeOffsetUs)
+	} else {
+		return blockTime + time.Duration(a.ProduceTimeOffsetUs)
+	}
+}
+
+func (a ProducerPlugin) productionDisabledByPolicy() bool {
+	return a.ProductionEnabled || a.PauseProduction || a.MaxIrreversibleBlockAgeUs.Seconds() >= 0 && a.getIrreversibleBlockAge() >= a.MaxIrreversibleBlockAgeUs
 }
 
 //OnIncomingBlock ..
@@ -580,17 +668,49 @@ func (a *ProducerPlugin) OnIncomingBlock(block chain.SignedBlock, blockID *chain
 		return false
 	}
 
-	//bsf := myChain.CreateBlockStateFuture(&block)
+	bsf := myChain.CreateBlockStateFuture(&block)
 	a.UnappliedTransactions.AddAborted(myChain.AbortBlock())
 	ensure := func() {
 		a.ScheduleProductionLoop()
 	}
 
 	ensure()
-	//myChain.
+	myChain.PushBlock(bsf, chain.ForkedBranchCallback(func(arg1 *chain.BranchType) {
+		a.UnappliedTransactions.AddForked(arg1)
+	}), chain.TrxMetaCacheLookup(func(arg1 *crypto.Sha256) chain.TransactionMetadata {
+		return a.UnappliedTransactions.GetTrx(arg1)
+	}))
+
+	hbs := myChain.HeadBlockState()
+	if int64(hbs.Header.Timestamp.Next().Time()) >= time.Now().Unix() {
+		a.ProductionEnabled = true
+	}
+
+	if time.Now().Unix()-int64(block.Timestamp.Time()) < int64(5*time.Minute.Seconds()) || blkNum%1000 == 0 {
+		log.AppLog().Info("Received block %s... #${%d} @ ${%d} signed by ${%s} [trxs: ${%d}, lib: ${%d},conf: ${%d}, latency: ${%d} ms]"+
+			id.String()[8:16], blkNum, block.Timestamp.Time(), block.Producer.ToString(), len(block.Transactions),
+			myChain.LastIrreversibleBlockNum(), block.Confirmed, time.Now().Unix()-int64(block.Timestamp.Time()/1000))
+
+		if myChain.GetReadMode() != Irreversible && hbs.ID == id && hbs.Block != nil {
+			log.AppLog().Info("Block not applied to head %s... #${%d} @ ${%d} signed by ${%s} [trxs: ${%d}, dpos: ${%d},conf: ${%d}, latency: ${%d} ms]"+
+				id.String()[8:16], blkNum, block.Timestamp.Time(), block.Producer.ToString(), len(block.Transactions),
+				hbs.DposProposedIrreversibleBlocknum, block.Confirmed, time.Now().Unix()-int64(block.Timestamp.Time()/1000))
+		}
+	}
 
 	return true
 }
+
+const (
+	//Speculative ..
+	Speculative = iota
+	//Head ..
+	Head = iota
+	//ReadOnly ..
+	ReadOnly = iota
+	//Irreversible ..
+	Irreversible = iota
+)
 
 //MakeKeySignatureProvider ..
 func (a *ProducerPlugin) MakeKeySignatureProvider(key chain.PrivateKeType) SignatureProviderType {

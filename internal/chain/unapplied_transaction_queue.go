@@ -112,3 +112,23 @@ func (u *UnappliedTransactionQueue) AddAborted(abortedTrxs []*TransactionMetadat
 		u.queue[trx.ID()] = tmp
 	}
 }
+
+//AddForked ..
+func (u *UnappliedTransactionQueue) AddForked(forkedBranch *BranchType) {
+	if u.mode == NonSpeculative || u.mode == SpeculativeNonProducer {
+		return
+	}
+
+	for _, t := range *forkedBranch {
+		for _, k := range t.TrxsMetas() {
+			expiry := k.packedTrx.Expiration()
+			tmp := UnappliedTransaction{TrxMeta: k, Expirty: expiry, TrxEnumType: Forked}
+			u.queue[k.ID()] = tmp
+		}
+	}
+}
+
+//GetTrx ..
+func (u UnappliedTransactionQueue) GetTrx(id *TransactionIDType) TransactionMetadata {
+	return *u.queue[id].TrxMeta
+}

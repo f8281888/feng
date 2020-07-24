@@ -77,9 +77,9 @@ func (f *ForkDatabase) add(n *BlockState, ignoreDuplicate bool, validate bool, v
 		log.Assert("attempt to add null block state")
 	}
 
-	prevBh := f.getBlockHeader(&n.header.previous)
+	prevBh := f.getBlockHeader(&n.Header.previous)
 	if prevBh == nil {
-		log.Assert("unlinkable block id :%s, previous:%s", n.id.String(), n.header.previous.String())
+		log.Assert("unlinkable block id :%s, previous:%s", n.ID.String(), n.Header.previous.String())
 	}
 
 	if validate {
@@ -87,13 +87,13 @@ func (f *ForkDatabase) add(n *BlockState, ignoreDuplicate bool, validate bool, v
 		//exts.count(protocol_feature_activation::extension_id()) > 0 第一个元素出现的次数
 		if exts[0] != (BlockHeaderExtensionTypes{}) {
 			newProtocolFeatures := exts[0].protocolFeatureActivation.ProtocolFeatures
-			validator(n.header.Timestamp, prevBh.activatedProtocolFeatures.ProtocolFeatures, newProtocolFeatures)
+			validator(n.Header.Timestamp, prevBh.activatedProtocolFeatures.ProtocolFeatures, newProtocolFeatures)
 		}
 	}
 
-	_, ok := (*f.index)[n.id]
+	_, ok := (*f.index)[n.ID]
 	if !ok {
-		(*f.index)[n.id] = *n
+		(*f.index)[n.ID] = *n
 	}
 
 	for _, i := range *f.index {
@@ -105,7 +105,7 @@ func (f *ForkDatabase) add(n *BlockState, ignoreDuplicate bool, validate bool, v
 
 func (f *ForkDatabase) getBlockHeader(id *BlockIDType) *BlockState {
 	byIDIdx, ok := (*f.index)[id]
-	if f.root.id == id {
+	if f.root.ID == id {
 		return f.root
 	}
 

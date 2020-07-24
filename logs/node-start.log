@@ -725,3 +725,75 @@
 2020-07-23T17:41:35.257+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
 2020-07-23T17:41:40.022+0800	INFO	app/appplication.go:154	receive signal :interrupt
 2020-07-23T17:41:40.022+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-23T17:53:38.884+0800	INFO	node/start.go:23	node start
+2020-07-23T17:53:38.885+0800	INFO	node/node.go:18	node business start
+2020-07-23T17:53:38.885+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-23T17:53:38.885+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-23T17:53:38.885+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-23T17:53:38.885+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-23T17:53:38.885+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-23T17:53:38.885+0800	INFO	chain/controller.go:168	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-23T17:53:38.885+0800	INFO	chain/controller.go:220	Initializing new blockchain with genesis state
+2020-07-23T17:53:38.885+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-23T17:53:55.200+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-23T17:53:55.200+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-24T11:03:57.719+0800	INFO	node/start.go:23	node start
+2020-07-24T11:03:57.719+0800	INFO	node/node.go:18	node business start
+2020-07-24T11:03:57.719+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-24T11:03:57.719+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-24T11:03:57.719+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-24T11:03:57.719+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-24T11:03:57.719+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-24T11:03:57.720+0800	INFO	chain/controller.go:168	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-24T11:03:57.720+0800	INFO	chain/controller.go:220	Initializing new blockchain with genesis state
+2020-07-24T11:03:57.720+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-24T11:04:00.311+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-24T11:04:00.311+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-24T16:02:51.132+0800	INFO	node/start.go:23	node start
+2020-07-24T16:02:51.132+0800	INFO	node/node.go:18	node business start
+2020-07-24T16:02:51.132+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-24T16:02:51.132+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-24T16:02:51.132+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-24T16:02:51.132+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-24T16:02:51.133+0800	INFO	chain/controller.go:168	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-24T16:02:51.133+0800	INFO	chain/controller.go:220	Initializing new blockchain with genesis state
+2020-07-24T16:02:51.133+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-24T16:02:51.133+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-24T16:03:09.446+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-24T16:03:09.446+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-24T17:21:09.267+0800	INFO	node/start.go:23	node start
+2020-07-24T17:21:09.268+0800	INFO	node/node.go:18	node business start
+2020-07-24T17:21:09.268+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-24T17:21:09.268+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-24T17:21:09.268+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-24T17:21:09.268+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-24T17:21:09.268+0800	INFO	chain/controller.go:168	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-24T17:21:09.268+0800	INFO	chain/controller.go:220	Initializing new blockchain with genesis state
+2020-07-24T17:21:09.269+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-24T17:21:09.269+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-24T17:21:13.768+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-24T17:21:13.768+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-24T20:28:01.052+0800	INFO	node/start.go:23	node start
+2020-07-24T20:28:01.053+0800	INFO	node/node.go:18	node business start
+2020-07-24T20:28:01.053+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-24T20:28:01.053+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-24T20:28:01.053+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-24T20:28:01.053+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-24T20:28:01.053+0800	INFO	chain/controller.go:187	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-24T20:28:01.053+0800	INFO	chain/controller.go:239	Initializing new blockchain with genesis state
+2020-07-24T20:28:01.053+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-24T20:28:01.054+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-24T20:28:16.602+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-24T20:28:16.602+0800	ERROR	log/logger.go:45	startSighupHandler
+2020-07-24T20:53:26.916+0800	INFO	node/start.go:23	node start
+2020-07-24T20:53:26.917+0800	INFO	node/node.go:18	node business start
+2020-07-24T20:53:26.917+0800	INFO	chain_plugin/chain_plugin.go:50	initializing chain plugin
+2020-07-24T20:53:26.917+0800	INFO	node/node.go:38	node version 1.0 version 1.0.1
+2020-07-24T20:53:26.917+0800	INFO	node/node.go:39	node using configuration file ../config
+2020-07-24T20:53:26.917+0800	INFO	node/node.go:40	node data directory is ../data
+2020-07-24T20:53:26.917+0800	INFO	net_plugin/net_plugin.go:243	my node_id is {[] <nil>}
+2020-07-24T20:53:26.917+0800	INFO	chain/controller.go:188	No existing chain state or fork database. Initializing fresh blockchain state and resetting fork database.
+2020-07-24T20:53:26.917+0800	INFO	chain/controller.go:240	Initializing new blockchain with genesis state
+2020-07-24T20:53:26.917+0800	INFO	http_plugin/http_plugin.go:100	configured http to listen on 127.0.0.1:8888
+2020-07-24T20:53:29.792+0800	INFO	app/appplication.go:154	receive signal :interrupt
+2020-07-24T20:53:29.792+0800	ERROR	log/logger.go:45	startSighupHandler

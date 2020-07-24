@@ -9,8 +9,9 @@ type BlockTimestamp struct {
 }
 
 //Next 下一秒
-func (b *BlockTimestamp) Next() {
+func (b *BlockTimestamp) Next() *BlockTimestamp {
 	b.time++
+	return b
 }
 
 //Time ..

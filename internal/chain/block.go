@@ -29,7 +29,7 @@ type TransactionReceipt struct {
 //SignedBlock ..
 type SignedBlock struct {
 	SignedBlockHeader
-	transactions []TransactionReceipt
+	Transactions []TransactionReceipt
 }
 
 //BlockNum ..
@@ -41,8 +41,8 @@ func (s SignedBlock) BlockNum() uint32 {
 func (s *SignedBlock) Copy(copy SignedBlockHeader) {
 	s.producerSignature = copy.producerSignature
 	s.Timestamp = copy.Timestamp
-	s.producer = copy.producer
-	s.confirmed = copy.confirmed
+	s.Producer = copy.Producer
+	s.Confirmed = copy.Confirmed
 	s.previous = copy.previous
 	s.transactionMroot = copy.transactionMroot
 	s.actionMroot = copy.actionMroot

@@ -11,9 +11,9 @@ type BlockHeader struct {
 	//时间戳 生成区块的时间
 	Timestamp BlockTimestamp
 	//生产区块的节点
-	producer Name
+	Producer Name
 	//区块的确认数
-	confirmed uint16
+	Confirmed uint16
 	previous  crypto.Sha256
 	//交易的默克尔树  区块中全部交易的默克尔树的哈希值
 	transactionMroot crypto.Sha256

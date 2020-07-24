@@ -7,7 +7,7 @@ import (
 //BlockHeaderStateCommon ..
 type BlockHeaderStateCommon struct {
 	BlockNum                         uint32
-	dposProposedIrreversibleBlocknum uint32
+	DposProposedIrreversibleBlocknum uint32
 	dposIrreversibleBlocknum         uint32
 	ActiveSchedule                   ProducerAuthoritySchedule
 }
@@ -28,8 +28,8 @@ type BlockHeaderExtensionTypes struct {
 //BlockHeaderState ..
 type BlockHeaderState struct {
 	BlockHeaderStateCommon
-	id              *crypto.Sha256
-	header          SignedBlockHeader
+	ID              *crypto.Sha256
+	Header          SignedBlockHeader
 	pendingSchedule ScheduleInfo
 	//flat_multimap<uint16_t, block_header_extension>
 	headerExts                map[uint16]BlockHeaderExtensionTypes
@@ -51,4 +51,17 @@ func (b BlockHeaderState) GetNewProtocolFeatureActivations() []DigestType {
 	}
 
 	return b.headerExts[0].protocolFeatureActivation.ProtocolFeatures
+}
+
+//PendingBlockHeaderState ..
+type PendingBlockHeaderState struct {
+	BlockHeaderStateCommon
+	PrevActivatedProtocolFeatures ProtocolFeatureActivationSet
+	PrevPendingSchedule           ScheduleInfo
+	WasPendingPromoted            bool
+	Previous                      BlockIDType
+	Producer                      AccountName
+	Timestamp                     BlockTimestamp
+	ActiveScheduleVersion         uint32
+	Confirmed                     uint16
 }

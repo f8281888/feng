@@ -7,7 +7,7 @@ import (
 //BlockState ..
 type BlockState struct {
 	BlockHeaderState
-	block           *SignedBlock
+	Block           *SignedBlock
 	validated       bool
 	pubKeysRecoverd bool
 	cachedTrxs      []*TransactionMetadata
@@ -31,14 +31,19 @@ type BranchType []*BlockState
 
 //Copy ..
 func (b *BlockState) Copy(h BlockHeaderState) {
-	b.id = &crypto.Sha256{}
-	b.id = h.id
-	b.header = h.header
+	b.ID = &crypto.Sha256{}
+	b.ID = h.ID
+	b.Header = h.Header
 	b.pendingSchedule = h.pendingSchedule
 	b.headerExts = h.headerExts
 	b.activatedProtocolFeatures = h.activatedProtocolFeatures
 	b.BlockNum = h.BlockNum
 	b.dposIrreversibleBlocknum = h.dposIrreversibleBlocknum
-	b.dposProposedIrreversibleBlocknum = h.dposProposedIrreversibleBlocknum
+	b.DposProposedIrreversibleBlocknum = h.DposProposedIrreversibleBlocknum
 	b.ActiveSchedule = h.ActiveSchedule
+}
+
+//TrxsMetas ..
+func (b BlockState) TrxsMetas() []*TransactionMetadata {
+	return b.cachedTrxs
 }
